@@ -1,0 +1,27 @@
+{
+  "name": "crop-my-screen",
+  "version": "1.0.0",
+  "description": "Crop MediaStream in browser",
+  "scripts": {
+    "build": "webpack --mode production",
+    "start": "webpack serve --mode development",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "crop",
+    "screensharing",
+    "js",
+    "vanilla"
+  ],
+  "author": "Vlad Lyamzin",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "babel-loader": "^8.2.3",
+    "eslint": "^8.3.0",
+    "eslint-webpack-plugin": "^3.1.1",
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1"
+  }
+}
