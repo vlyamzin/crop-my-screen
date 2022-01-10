@@ -8,7 +8,7 @@
                     "chrome": "72",
                     "safari": "13"
                 },
-                "useBuiltIns": "usage",
+                "useBuiltIns": "entry",
                 "corejs": "3.18.0"
             }
         ]

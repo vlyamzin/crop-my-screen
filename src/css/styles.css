@@ -1,0 +1,114 @@
+#crms-container {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  /* right: 0; */
+  /* width: 300px;
+  height: 300px; */
+  z-index: 10;
+  border-radius: 5px;
+  /* overflow: hidden; */
+  box-shadow: 1px 1px 7px 0px #343434;
+}
+
+#crms-popup {
+	
+}
+
+#crms-preview-header {
+	height: 30px;
+	cursor: grab;
+}
+
+#crms-preview-footer {
+	height: 50px;
+	padding: 5px 10px;
+}
+
+#crms-input {
+	display: none;
+	visibility: hidden;
+}
+
+#crms-output {
+	display: block;
+  background-color: #6a6a6a;
+}
+
+/* #sharingScreen.visible {
+  display: block;
+} */
+
+ /* screen share area selector */
+ #backdrop-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#drag-markers-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.draggable {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  cursor: move;
+  z-index: 2;
+}
+
+.btn {
+	display: inline-block;
+	font-weight: 400;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	border: 1px solid #f8f9fa;
+	padding: .375rem .75rem;
+	font-size: 1rem;
+	line-height: 1.5;
+	border-radius: .25rem;
+	transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	color: #212529;
+	background-color: #f8f9fa;
+	cursor: pointer;
+}
+
+.btn:hover {
+	background-color: #e2e6ea;
+	border-color: #dae0e5;
+}
+
+.btn-primary {
+	color: #fff;
+	background-color: #007bff;
+	border-color: #007bff;
+}
+.btn-primary:hover {
+	background-color: #0069d9;
+	border-color: #0062cc;
+}
+
+/* end screen share area selector */
+#buttons {
+  position: absolute;
+  bottom: 0;
+  padding: 1rem;
+  background: #6a6a6a;
+  z-index: 999;
+}
+
+.crms-hidden {
+	display: none !important;
+	visibility: hidden;
+}
