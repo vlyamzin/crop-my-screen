@@ -1,3 +1,6 @@
+import AriaSelector from './aria-selector';
+import {getUserAgent, getScreenOffset, getBrowserHeaderSize} from './util';
+
 let withPrefix;
 const doCallback = (callback, params) => {
   if (callback && typeof callback === 'function') {
@@ -6,9 +9,16 @@ const doCallback = (callback, params) => {
 };
 
 export default class Cropper {
+  constraints;
+  ariaSelector;
   containerEl;
   videoEl;
   canvas;
+  displaySurfaceType;
+  buttonGroup = {
+    1: [],
+    2: []
+  };
 
   _prefix;
   _containerId = 'container';
@@ -19,6 +29,7 @@ export default class Cropper {
     withPrefix = (id) => {
       return `${prefix}-${id}`;
     };
+    this.ariaSelector = new AriaSelector();
   }
 
   render() {
@@ -40,11 +51,14 @@ export default class Cropper {
   }
 
   startStream(stream, constraints) {
-    const { x, y, dx, dy } = constraints;
+    const { dx, dy } = constraints;
     const context = this.canvas.getContext('2d');
+    const streamSettings = stream.getVideoTracks()[0].getSettings();
+    this.displaySurfaceType = streamSettings && streamSettings.displaySurface;
+    this.constraints = this._correctCoordinates(constraints, true);
 
     this.videoEl.ontimeupdate = () => {
-      this._cropFrame(context, this.videoEl, x, y, dx, dy);
+      this._cropFrame(context, this.videoEl);
     };
 
     this.videoEl.onpause = () => context.clearRect(0, 0, dx, dy);
@@ -71,19 +85,21 @@ export default class Cropper {
 
   onStreamStopped() {}
 
-  _cropFrame(context, video, startX, startY, endX, endY) {
+  _cropFrame(context, video) {
     if (!context) return;
+
+    const {x: startX, y: startY, dx: cropW, dy: cropH} = this.constraints;
 
     context.drawImage(
       video,
       startX,
       startY,
-      endX,
-      endY,
+      cropW,
+      cropH,
       0,
       0,
-      endX,
-      endY
+      cropW,
+      cropH
     );
   }
 
@@ -120,30 +136,53 @@ export default class Cropper {
       id: withPrefix('btn-close'),
       text: 'Close',
       callback: () => {
-        // trigger onStreamCancel event
         this.stopStream();
         this.onStreamStopped();
       }
     };
 
-    const shareArea = {
-      id: withPrefix('btn-get-share-area'),
+    const selectArea = {
+      id: withPrefix('btn-select-area'),
       text: 'Select Area',
       primary: false,
       visible: true,
-      callback: () => console.log('Area selection is disabled')
+      group: this.buttonGroup['1'],
+      callback: () => {
+        const constraints = this._correctCoordinates(this.constraints, false);
+        this.ariaSelector.init(this.displaySurfaceType, constraints);
+        this._toggleButtons(2);
+      }
     };
-    const cancelArea = {
-      id: withPrefix('btn-cancel-share-area'),
+    const cancelAreaSelection = {
+      id: withPrefix('btn-cancel-selection'),
       text: 'Cancel',
       primary: false,
-      callback: () => console.log('cancel'),
-      visible: false
+      visible: false,
+      group: this.buttonGroup['2'],
+      callback: () => {
+        this.ariaSelector.remove();
+        this._toggleButtons(1);
+      },
+    };
+    const applyAreaSelection = {
+      id: withPrefix('btn-apply-selection'),
+      text: 'Apply',
+      primary: true,
+      visible: false,
+      group: this.buttonGroup['2'],
+      callback: () => {
+        this.constraints = this._correctCoordinates(this.ariaSelector.getCoords(), true);
+        this.ariaSelector.remove();
+        this.canvas.width = this.constraints.dx;
+        this.canvas.height = this.constraints.dy;
+        this._toggleButtons(1);
+      },
     };
     const shareStart = {
       id: withPrefix('btn-start-sharing'),
       text: 'Start presentation',
       primary: true,
+      group: this.buttonGroup['1'],
       callback: () => {
         const stream = canvas.captureStream();
         this.onStreamStarted(stream);
@@ -156,7 +195,7 @@ export default class Cropper {
       popupHeader.appendChild(btn);
     });
 
-    [cancelArea, shareArea, shareStart].forEach(btnSettings => {
+    [cancelAreaSelection, applyAreaSelection, selectArea, shareStart].forEach(btnSettings => {
       let btn = this._initPreviewButton(btnSettings);
       popupFooter.appendChild(btn);
     });
@@ -175,6 +214,7 @@ export default class Cropper {
     const btn = document.createElement('button');
     btn.setAttribute('id', id);
     btn.setAttribute('type', 'button');
+    btn.classList.add('crms-control');
     btn.innerText = text;
     btn.onclick = () => {
       doCallback(callback);
@@ -182,11 +222,12 @@ export default class Cropper {
     return btn;
   }
 
-  _initPreviewButton({ id, text, primary, visible, callback }) {
+  _initPreviewButton({ id, text, primary, visible, group, callback }) {
     const btn = document.createElement('button');
     btn.setAttribute('id', id);
     btn.setAttribute('type', 'button');
-    btn.classList.add('btn');
+    btn.classList.add('btn', 'crms-control');
+    group && group.push(btn);
     primary && btn.classList.add('btn-primary');
     btn.innerText = text;
     btn.onclick = () => {
@@ -206,5 +247,54 @@ export default class Cropper {
       : this.containerEl.classList.add(withPrefix('hidden'));
   }
 
+  _toggleButtons(status) {
+    if (status === 1) {
+      this.buttonGroup['1'].forEach(btn => btn.classList.remove(withPrefix('hidden')));
+      this.buttonGroup['2'].forEach(btn => btn.classList.add(withPrefix('hidden')));
+      return;
+    }
+
+    if (status === 2) {
+      this.buttonGroup['2'].forEach(btn => btn.classList.remove(withPrefix('hidden')));
+      this.buttonGroup['1'].forEach(btn => btn.classList.add(withPrefix('hidden')));
+    }
+  }
+
+
+  // correct coordinates based on screen-sharing type (the whole screen or browser/tab only)
+  // 'monitor' is the whole screen
+  // there might be a chance when displaySurface prop is not defined. It happens only in Firefox (version < 93)
+  // as it does not support MediaTrackSettings.displaySurface
+  _correctCoordinates(coordinates, applyOffset) {
+    const browser = getUserAgent();
+
+    if (!this.displaySurfaceType || this.displaySurfaceType === 'monitor') {
+      let { top: screenOffsetTop, left: screenOffsetLeft } = getScreenOffset();
+
+      return {
+        ...coordinates,
+        x: applyOffset ? (coordinates.x + screenOffsetLeft) : (coordinates.x - screenOffsetLeft),
+        y: applyOffset ? (coordinates.y + screenOffsetTop) : (coordinates.y - screenOffsetTop),
+      };
+    }
+
+    if (this.displaySurfaceType === 'window') {
+      let buggedOffset = 0;
+
+      // in Chrome if user selects 'window' or 'tab' for sharing there is a strange bug with extra 7px offset from top
+      if (browser === 'Chrome') {
+        buggedOffset = 7 * window.devicePixelRatio;
+      }
+
+      return {
+        ...coordinates,
+        y: applyOffset
+          ? (coordinates.y + getBrowserHeaderSize() + buggedOffset)
+          : (coordinates.y - getBrowserHeaderSize() - buggedOffset),
+      };
+    }
+
+    return coordinates;
+  }
 
 }

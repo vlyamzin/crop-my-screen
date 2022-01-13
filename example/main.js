@@ -1,8 +1,14 @@
 (function () {
 
   const startBtn = document.querySelector('#start-screenshare');
+  const iframe = document.querySelector('iframe');
+  const constraints = iframe.getClientRects()[0];
   const cropper = new CropMyScreen({
-    previewerClass: 'test'
+    previewerClass: 'test',
+    cropX: constraints.x,
+    cropY: constraints.y,
+    cropW: constraints.width,
+    cropH: constraints.height
   });
 
   cropper.init();
@@ -14,6 +20,11 @@
         audio: false
       });
       const videoTrack = stream.getVideoTracks()[0];
+      const constraints = {
+        width: screen.width,
+        height: screen.height
+      };
+      await videoTrack.applyConstraints(constraints);
 
       cropper.start(stream)
         .then((stream) => {
