@@ -2,17 +2,17 @@
 	position: absolute;
 	bottom: 0;
 	left: 0;
-	/* right: 0; */
-	/* width: 300px;
-	height: 300px; */
 	z-index: 10;
+	background: #fff;
 	border-radius: 5px;
 	overflow: hidden;
 	box-shadow: 1px 1px 7px 0 #343434;
 }
 
-#crms-popup {
-
+#crms-canvas-wrap {
+	display: flex;
+	justify-content: center;
+	background: #d3d3d3;
 }
 
 #crms-preview-header {

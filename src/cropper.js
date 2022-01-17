@@ -1,8 +1,10 @@
 import AriaSelector from './aria-selector';
+import WindowManager from './window-manager';
 import {getUserAgent, getScreenOffset, getBrowserHeaderSize} from './util';
 import xmarkSVG from './assets/xmark.svg';
 import minimizeSVG from './assets/window-minimize.svg';
 import restoreSVG from './assets/window-maximize.svg';
+
 
 let withPrefix;
 const doCallback = (callback, params) => {
@@ -14,6 +16,7 @@ const doCallback = (callback, params) => {
 export default class Cropper {
   constraints;
   ariaSelector;
+  windowManager;
   containerEl;
   videoEl;
   canvas;
@@ -41,7 +44,7 @@ export default class Cropper {
     this.containerEl = this._createElement('div', withPrefix(this._containerId));
     this.videoEl = this._createElement('video', withPrefix('input'));
     this.canvas = this._createElement('canvas', withPrefix('output'));
-    const { popup } = this._initPreviewer(this.canvas);
+    const popup = this._initPreviewer(this.canvas);
 
     this.videoEl.muted = true;
 
@@ -51,10 +54,11 @@ export default class Cropper {
     this._togglePreviewer(false);
 
     document.body.appendChild(this.containerEl);
+    this.windowManager = new WindowManager(this.containerEl);
   }
 
   startStream(stream, constraints) {
-    const { dx, dy } = constraints;
+    const {dx, dy} = constraints;
     const context = this.canvas.getContext('2d');
     const streamSettings = stream.getVideoTracks()[0].getSettings();
     this.displaySurfaceType = streamSettings && streamSettings.displaySurface;
@@ -83,12 +87,17 @@ export default class Cropper {
   }
 
   destroy() {
+    this.ariaSelector.destroy();
+    this.windowManager.destroy();
     this.containerEl.remove();
   }
 
-  onStreamStarted(stream) {console.log(stream);}
+  onStreamStarted(stream) {
+    console.log(stream);
+  }
 
-  onStreamStopped() {}
+  onStreamStopped() {
+  }
 
   _cropFrame(context, video) {
     if (!context) return;
@@ -116,29 +125,30 @@ export default class Cropper {
 
   _initPreviewer(canvas) {
     const popup = this._createElement('div', withPrefix('preview'));
+    const canvasWrap = this._createElement('div', withPrefix('canvas-wrap'));
     const popupHeader = this._createElement('div', withPrefix('preview-header'));
     const popupFooter = this._createElement('div', withPrefix('preview-footer'));
 
+    popupHeader.classList.add('window-move');
+
     this._headerButtonsConfig.forEach(btnSettings => {
       let btn = this._renderHeaderButton(btnSettings);
-      popupHeader.appendChild(btn);
+      popupHeader.append(btn);
     });
 
     this._footerButtonsConfig.forEach(btnSettings => {
       let btn = this._initPreviewButton(btnSettings);
-      popupFooter.appendChild(btn);
+      popupFooter.append(btn);
     });
 
 
-    popup.appendChild(popupHeader);
-    popup.appendChild(canvas);
-    popup.appendChild(popupFooter);
+    canvasWrap.append(canvas);
+    popup.append(popupHeader, canvasWrap, popupFooter);
 
-    return {
-      popup,
-    };
+    return popup;
+
   }
-  
+
   _renderHeaderButton({id, icon, callback, iconSize}) {
     const btn = document.createElement('button');
     btn.setAttribute('id', id);
@@ -147,12 +157,13 @@ export default class Cropper {
     iconSize && btn.classList.add(iconSize);
     btn.innerHTML = icon;
     btn.onclick = (event) => {
+      event.stopPropagation();
       doCallback(callback, event.currentTarget);
     };
     return btn;
   }
 
-  _initPreviewButton({ id, text, primary, visible, group, callback }) {
+  _initPreviewButton({id, text, primary, visible, group, callback}) {
     const btn = document.createElement('button');
     btn.setAttribute('id', id);
     btn.setAttribute('type', 'button');
@@ -199,7 +210,7 @@ export default class Cropper {
     const browser = getUserAgent();
 
     if (!this.displaySurfaceType || this.displaySurfaceType === 'monitor') {
-      let { top: screenOffsetTop, left: screenOffsetLeft } = getScreenOffset();
+      let {top: screenOffsetTop, left: screenOffsetLeft} = getScreenOffset();
 
       return {
         ...coordinates,

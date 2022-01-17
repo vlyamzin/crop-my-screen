@@ -3,16 +3,6 @@ import './css/styles.css';
 
 class CropMyScreen {
   static prefix = 'crms';
-  // BACKDROP_COLOR;
-  // CROP_X;
-  // CROP_Y;
-  // CROP_W;
-  // CROP_H;
-  // START_X;
-  // START_Y;
-  // END_X;
-  // END_Y;
-
   settings;
   cropper;
 

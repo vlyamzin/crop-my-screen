@@ -42,16 +42,13 @@ export default class AriaSelector {
       this.drawing = true;
       this.START_X = e.clientX;
       this.START_Y = e.clientY;
-      console.log(this.START_X, this.START_Y);
     };
 
     // screen-sharing area selection end
     this.areaSelectionEnd = (e) => {
       e.preventDefault();
       e.stopPropagation();
-
-      console.log(this.START_X, this.START_Y);
-
+      
       // prevent area selection if a user clicks on buttons in the previewer
       if (e.target.classList.contains('crms-control')) {
         return;
@@ -338,14 +335,5 @@ export default class AriaSelector {
       break;
     }
     }
-  }
-
-  // screen-sharing area resize end
-  _areaResizeEnd() {
-    this.resizing = false;
-    this.dragPoint = null;
-    this._drawArea();
-    this._drawResizeMarkers(this.backdropCtx);
-    // RemotePlatformHelper.showElementById('sharingScreen');
   }
 }

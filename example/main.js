@@ -33,7 +33,6 @@
         })
         .catch(() => {
           console.error('Unable to get cropped stream');
-          cropper.destroy();
         });
 
       videoTrack.onended = () => cropper.stop();

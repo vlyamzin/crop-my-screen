@@ -70,14 +70,12 @@ class AriaSelector {
       this.drawing = true;
       this.START_X = e.clientX;
       this.START_Y = e.clientY;
-      console.log(this.START_X, this.START_Y);
     }; // screen-sharing area selection end
 
 
     this.areaSelectionEnd = e => {
       e.preventDefault();
-      e.stopPropagation();
-      console.log(this.START_X, this.START_Y); // prevent area selection if a user clicks on buttons in the previewer
+      e.stopPropagation(); // prevent area selection if a user clicks on buttons in the previewer
 
       if (e.target.classList.contains('crms-control')) {
         return;
@@ -376,17 +374,6 @@ class AriaSelector {
           break;
         }
     }
-  } // screen-sharing area resize end
-
-
-  _areaResizeEnd() {
-    this.resizing = false;
-    this.dragPoint = null;
-
-    this._drawArea();
-
-    this._drawResizeMarkers(this.backdropCtx); // RemotePlatformHelper.showElementById('sharingScreen');
-
   }
 
 }
@@ -405,14 +392,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ Cropper)
 /* harmony export */ });
 /* harmony import */ var _aria_selector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./aria-selector */ "./src/aria-selector.js");
-/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util */ "./src/util.js");
-/* harmony import */ var _assets_xmark_svg__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./assets/xmark.svg */ "./src/assets/xmark.svg");
-/* harmony import */ var _assets_xmark_svg__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_assets_xmark_svg__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./assets/window-minimize.svg */ "./src/assets/window-minimize.svg");
-/* harmony import */ var _assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./assets/window-maximize.svg */ "./src/assets/window-maximize.svg");
-/* harmony import */ var _assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _window_manager__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./window-manager */ "./src/window-manager.js");
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./util */ "./src/util.js");
+/* harmony import */ var _assets_xmark_svg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./assets/xmark.svg */ "./src/assets/xmark.svg");
+/* harmony import */ var _assets_xmark_svg__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_assets_xmark_svg__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./assets/window-minimize.svg */ "./src/assets/window-minimize.svg");
+/* harmony import */ var _assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./assets/window-maximize.svg */ "./src/assets/window-maximize.svg");
+/* harmony import */ var _assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_5__);
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -432,6 +421,8 @@ class Cropper {
     _defineProperty(this, "constraints", void 0);
 
     _defineProperty(this, "ariaSelector", void 0);
+
+    _defineProperty(this, "windowManager", void 0);
 
     _defineProperty(this, "containerEl", void 0);
 
@@ -465,9 +456,7 @@ class Cropper {
     this.videoEl = this._createElement('video', withPrefix('input'));
     this.canvas = this._createElement('canvas', withPrefix('output'));
 
-    const {
-      popup
-    } = this._initPreviewer(this.canvas);
+    const popup = this._initPreviewer(this.canvas);
 
     this.videoEl.muted = true;
     this.containerEl.appendChild(this.videoEl);
@@ -476,6 +465,7 @@ class Cropper {
     this._togglePreviewer(false);
 
     document.body.appendChild(this.containerEl);
+    this.windowManager = new _window_manager__WEBPACK_IMPORTED_MODULE_1__["default"](this.containerEl);
   }
 
   startStream(stream, constraints) {
@@ -513,6 +503,8 @@ class Cropper {
   }
 
   destroy() {
+    this.ariaSelector.destroy();
+    this.windowManager.destroy();
     this.containerEl.remove();
   }
 
@@ -542,28 +534,29 @@ class Cropper {
   _initPreviewer(canvas) {
     const popup = this._createElement('div', withPrefix('preview'));
 
+    const canvasWrap = this._createElement('div', withPrefix('canvas-wrap'));
+
     const popupHeader = this._createElement('div', withPrefix('preview-header'));
 
     const popupFooter = this._createElement('div', withPrefix('preview-footer'));
 
+    popupHeader.classList.add('window-move');
+
     this._headerButtonsConfig.forEach(btnSettings => {
       let btn = this._renderHeaderButton(btnSettings);
 
-      popupHeader.appendChild(btn);
+      popupHeader.append(btn);
     });
 
     this._footerButtonsConfig.forEach(btnSettings => {
       let btn = this._initPreviewButton(btnSettings);
 
-      popupFooter.appendChild(btn);
+      popupFooter.append(btn);
     });
 
-    popup.appendChild(popupHeader);
-    popup.appendChild(canvas);
-    popup.appendChild(popupFooter);
-    return {
-      popup
-    };
+    canvasWrap.append(canvas);
+    popup.append(popupHeader, canvasWrap, popupFooter);
+    return popup;
   }
 
   _renderHeaderButton(_ref) {
@@ -581,6 +574,7 @@ class Cropper {
     btn.innerHTML = icon;
 
     btn.onclick = event => {
+      event.stopPropagation();
       doCallback(callback, event.currentTarget);
     };
 
@@ -637,13 +631,13 @@ class Cropper {
 
 
   _correctCoordinates(coordinates, applyOffset) {
-    const browser = (0,_util__WEBPACK_IMPORTED_MODULE_1__.getUserAgent)();
+    const browser = (0,_util__WEBPACK_IMPORTED_MODULE_2__.getUserAgent)();
 
     if (!this.displaySurfaceType || this.displaySurfaceType === 'monitor') {
       let {
         top: screenOffsetTop,
         left: screenOffsetLeft
-      } = (0,_util__WEBPACK_IMPORTED_MODULE_1__.getScreenOffset)();
+      } = (0,_util__WEBPACK_IMPORTED_MODULE_2__.getScreenOffset)();
       return { ...coordinates,
         x: applyOffset ? coordinates.x + screenOffsetLeft : coordinates.x - screenOffsetLeft,
         y: applyOffset ? coordinates.y + screenOffsetTop : coordinates.y - screenOffsetTop
@@ -658,7 +652,7 @@ class Cropper {
       }
 
       return { ...coordinates,
-        y: applyOffset ? coordinates.y + (0,_util__WEBPACK_IMPORTED_MODULE_1__.getBrowserHeaderSize)() + buggedOffset : coordinates.y - (0,_util__WEBPACK_IMPORTED_MODULE_1__.getBrowserHeaderSize)() - buggedOffset
+        y: applyOffset ? coordinates.y + (0,_util__WEBPACK_IMPORTED_MODULE_2__.getBrowserHeaderSize)() + buggedOffset : coordinates.y - (0,_util__WEBPACK_IMPORTED_MODULE_2__.getBrowserHeaderSize)() - buggedOffset
       };
     }
 
@@ -668,7 +662,7 @@ class Cropper {
   get _headerButtonsConfig() {
     const minimize = {
       id: withPrefix('btn-minimize'),
-      icon: (_assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_3___default()),
+      icon: (_assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_4___default()),
       iconSize: 's20',
       callback: (() => {
         let minimized = false;
@@ -676,11 +670,11 @@ class Cropper {
           const popupFooter = document.querySelector(`#${withPrefix('preview-footer')}`);
 
           if (minimized) {
-            button.innerHTML = (_assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_3___default());
+            button.innerHTML = (_assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_4___default());
             this.canvas.classList.remove(withPrefix('hidden'));
             popupFooter.classList.remove(withPrefix('hidden'));
           } else {
-            button.innerHTML = (_assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_4___default());
+            button.innerHTML = (_assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_5___default());
             this.canvas.classList.add(withPrefix('hidden'));
             popupFooter.classList.add(withPrefix('hidden'));
           }
@@ -691,7 +685,7 @@ class Cropper {
     };
     const close = {
       id: withPrefix('btn-close'),
-      icon: (_assets_xmark_svg__WEBPACK_IMPORTED_MODULE_2___default()),
+      icon: (_assets_xmark_svg__WEBPACK_IMPORTED_MODULE_3___default()),
       iconSize: 's24',
       callback: () => {
         this.stopStream();
@@ -819,6 +813,103 @@ function getBrowserHeaderSize() {
 
 /***/ }),
 
+/***/ "./src/window-manager.js":
+/*!*******************************!*\
+  !*** ./src/window-manager.js ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ WindowManager)
+/* harmony export */ });
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+class WindowManager {
+  constructor(container) {
+    _defineProperty(this, "_isMoving", void 0);
+
+    _defineProperty(this, "_startCoords", void 0);
+
+    _defineProperty(this, "_translateOffset", void 0);
+
+    _defineProperty(this, "_deltaX", void 0);
+
+    _defineProperty(this, "_deltaY", void 0);
+
+    _defineProperty(this, "_dragZone", void 0);
+
+    _defineProperty(this, "_container", void 0);
+
+    this._container = container;
+    this._dragZone = container.querySelector('.window-move');
+
+    if (!this._container || !this._dragZone) {
+      console.error('WindowManager: Container is not available');
+      throw new Error('WindowManager: Container is not available');
+    }
+
+    this.init();
+  }
+
+  init() {
+    this._isMoving = false;
+    this._startCoords = {
+      x: 0,
+      y: 0
+    };
+    this._translateOffset = {
+      x: 0,
+      y: 0
+    };
+    this._deltaX = this._deltaY = 0;
+
+    this._dragZone.addEventListener('mousedown', this._mouseDown.bind(this), false);
+
+    document.addEventListener('mousemove', this._moveMove.bind(this), false);
+    document.addEventListener('mouseup', this._mouseUp.bind(this), false);
+  }
+
+  destroy() {
+    this._dragZone.removeEventListener('mousedown', this._mouseDown);
+
+    document.removeEventListener('mousemove', this._moveMove);
+    document.removeEventListener('mouseup', this._mouseUp);
+    this._container = null;
+    this._dragZone = null;
+  }
+
+  _mouseDown(event) {
+    this._isMoving = true;
+    this._dragZone.style.cursor = 'grabbing';
+    this._startCoords.x = event.clientX;
+    this._startCoords.y = event.clientY;
+  }
+
+  _moveMove(event) {
+    if (!this._isMoving) {
+      return;
+    }
+
+    this._deltaX = event.clientX - this._startCoords.x;
+    this._deltaY = event.clientY - this._startCoords.y;
+    this._container.style.transform = `translate(${this._deltaX + this._translateOffset.x}px, ${this._deltaY + this._translateOffset.y}px)`;
+  }
+
+  _mouseUp() {
+    if (this._isMoving) {
+      this._isMoving = false;
+      this._dragZone.style.cursor = 'grab';
+      this._translateOffset.x += this._deltaX;
+      this._translateOffset.y += this._deltaY;
+    }
+  }
+
+}
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js!./src/css/styles.css":
 /*!******************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!./src/css/styles.css ***!
@@ -839,7 +930,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "#crms-container {\n\tposition: absolute;\n\tbottom: 0;\n\tleft: 0;\n\t/* right: 0; */\n\t/* width: 300px;\n\theight: 300px; */\n\tz-index: 10;\n\tborder-radius: 5px;\n\toverflow: hidden;\n\tbox-shadow: 1px 1px 7px 0 #343434;\n}\n\n#crms-popup {\n\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n\tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n/* screen share area selector */\n#backdrop-wrapper {\n\tposition: fixed;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tz-index: 1;\n}\n\n#drag-markers-container {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n}\n\n.draggable {\n\tposition: absolute;\n\twidth: 16px;\n\theight: 16px;\n\tcursor: move;\n\tz-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tmargin: 0 .75rem;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n.icon-btn {\n\tbackground: none;\n\tborder: none;\n\toutline: none;\n\tpadding: 2px 7px;\n\tcursor: pointer;\n}\n\n.icon-btn.s20 {\n\tpadding: 4px 9px;\n}\n\n.icon-btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.icon-btn.s24 > svg {\n\twidth: 24px;\n\theight: 24px;\n}\n\n.icon-btn.s20 > svg {\n\twidth: 20px;\n\theight: 20px;\n}\n\n/* end screen share area selector */\n#buttons {\n\tposition: absolute;\n\tbottom: 0;\n\tpadding: 1rem;\n\tbackground: #6a6a6a;\n\tz-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n", "",{"version":3,"sources":["webpack://./src/css/styles.css"],"names":[],"mappings":"AAAA;CACC,kBAAkB;CAClB,SAAS;CACT,OAAO;CACP,cAAc;CACd;iBACgB;CAChB,WAAW;CACX,kBAAkB;CAClB,gBAAgB;CAChB,iCAAiC;AAClC;;AAEA;;AAEA;;AAEA;CACC,YAAY;CACZ,YAAY;CACZ,aAAa;CACb,oBAAoB;CACpB,mBAAmB;AACpB;;AAEA;CACC,YAAY;CACZ,iBAAiB;CACjB,aAAa;CACb,oBAAoB;CACpB,mBAAmB;AACpB;;AAEA;CACC,aAAa;CACb,kBAAkB;AACnB;;AAEA;CACC,cAAc;CACd,yBAAyB;AAC1B;;AAEA;;GAEG;;AAEH,+BAA+B;AAC/B;CACC,eAAe;CACf,MAAM;CACN,OAAO;CACP,WAAW;CACX,YAAY;CACZ,UAAU;AACX;;AAEA;CACC,kBAAkB;CAClB,MAAM;CACN,OAAO;AACR;;AAEA;CACC,kBAAkB;CAClB,WAAW;CACX,YAAY;CACZ,YAAY;CACZ,UAAU;AACX;;AAEA;CACC,qBAAqB;CACrB,gBAAgB;CAChB,kBAAkB;CAClB,mBAAmB;CACnB,sBAAsB;CACtB,yBAAyB;CACzB,sBAAsB;CACtB,qBAAqB;CACrB,iBAAiB;CACjB,yBAAyB;CACzB,gBAAgB;CAChB,uBAAuB;CACvB,eAAe;CACf,gBAAgB;CAChB,qBAAqB;CACrB,iIAAiI;CACjI,cAAc;CACd,yBAAyB;CACzB,eAAe;AAChB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,WAAW;CACX,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,gBAAgB;CAChB,YAAY;CACZ,aAAa;CACb,gBAAgB;CAChB,eAAe;AAChB;;AAEA;CACC,gBAAgB;AACjB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,WAAW;CACX,YAAY;AACb;;AAEA;CACC,WAAW;CACX,YAAY;AACb;;AAEA,mCAAmC;AACnC;CACC,kBAAkB;CAClB,SAAS;CACT,aAAa;CACb,mBAAmB;CACnB,YAAY;AACb;;AAEA;CACC,wBAAwB;CACxB,kBAAkB;AACnB","sourcesContent":["#crms-container {\n\tposition: absolute;\n\tbottom: 0;\n\tleft: 0;\n\t/* right: 0; */\n\t/* width: 300px;\n\theight: 300px; */\n\tz-index: 10;\n\tborder-radius: 5px;\n\toverflow: hidden;\n\tbox-shadow: 1px 1px 7px 0 #343434;\n}\n\n#crms-popup {\n\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n\tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n/* screen share area selector */\n#backdrop-wrapper {\n\tposition: fixed;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tz-index: 1;\n}\n\n#drag-markers-container {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n}\n\n.draggable {\n\tposition: absolute;\n\twidth: 16px;\n\theight: 16px;\n\tcursor: move;\n\tz-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tmargin: 0 .75rem;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n.icon-btn {\n\tbackground: none;\n\tborder: none;\n\toutline: none;\n\tpadding: 2px 7px;\n\tcursor: pointer;\n}\n\n.icon-btn.s20 {\n\tpadding: 4px 9px;\n}\n\n.icon-btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.icon-btn.s24 > svg {\n\twidth: 24px;\n\theight: 24px;\n}\n\n.icon-btn.s20 > svg {\n\twidth: 20px;\n\theight: 20px;\n}\n\n/* end screen share area selector */\n#buttons {\n\tposition: absolute;\n\tbottom: 0;\n\tpadding: 1rem;\n\tbackground: #6a6a6a;\n\tz-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "#crms-container {\n\tposition: absolute;\n\tbottom: 0;\n\tleft: 0;\n\tz-index: 10;\n\tbackground: #fff;\n\tborder-radius: 5px;\n\toverflow: hidden;\n\tbox-shadow: 1px 1px 7px 0 #343434;\n}\n\n#crms-canvas-wrap {\n\tdisplay: flex;\n\tjustify-content: center;\n\tbackground: #d3d3d3;\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n\tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n/* screen share area selector */\n#backdrop-wrapper {\n\tposition: fixed;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tz-index: 1;\n}\n\n#drag-markers-container {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n}\n\n.draggable {\n\tposition: absolute;\n\twidth: 16px;\n\theight: 16px;\n\tcursor: move;\n\tz-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tmargin: 0 .75rem;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n.icon-btn {\n\tbackground: none;\n\tborder: none;\n\toutline: none;\n\tpadding: 2px 7px;\n\tcursor: pointer;\n}\n\n.icon-btn.s20 {\n\tpadding: 4px 9px;\n}\n\n.icon-btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.icon-btn.s24 > svg {\n\twidth: 24px;\n\theight: 24px;\n}\n\n.icon-btn.s20 > svg {\n\twidth: 20px;\n\theight: 20px;\n}\n\n/* end screen share area selector */\n#buttons {\n\tposition: absolute;\n\tbottom: 0;\n\tpadding: 1rem;\n\tbackground: #6a6a6a;\n\tz-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n", "",{"version":3,"sources":["webpack://./src/css/styles.css"],"names":[],"mappings":"AAAA;CACC,kBAAkB;CAClB,SAAS;CACT,OAAO;CACP,WAAW;CACX,gBAAgB;CAChB,kBAAkB;CAClB,gBAAgB;CAChB,iCAAiC;AAClC;;AAEA;CACC,aAAa;CACb,uBAAuB;CACvB,mBAAmB;AACpB;;AAEA;CACC,YAAY;CACZ,YAAY;CACZ,aAAa;CACb,oBAAoB;CACpB,mBAAmB;AACpB;;AAEA;CACC,YAAY;CACZ,iBAAiB;CACjB,aAAa;CACb,oBAAoB;CACpB,mBAAmB;AACpB;;AAEA;CACC,aAAa;CACb,kBAAkB;AACnB;;AAEA;CACC,cAAc;CACd,yBAAyB;AAC1B;;AAEA;;GAEG;;AAEH,+BAA+B;AAC/B;CACC,eAAe;CACf,MAAM;CACN,OAAO;CACP,WAAW;CACX,YAAY;CACZ,UAAU;AACX;;AAEA;CACC,kBAAkB;CAClB,MAAM;CACN,OAAO;AACR;;AAEA;CACC,kBAAkB;CAClB,WAAW;CACX,YAAY;CACZ,YAAY;CACZ,UAAU;AACX;;AAEA;CACC,qBAAqB;CACrB,gBAAgB;CAChB,kBAAkB;CAClB,mBAAmB;CACnB,sBAAsB;CACtB,yBAAyB;CACzB,sBAAsB;CACtB,qBAAqB;CACrB,iBAAiB;CACjB,yBAAyB;CACzB,gBAAgB;CAChB,uBAAuB;CACvB,eAAe;CACf,gBAAgB;CAChB,qBAAqB;CACrB,iIAAiI;CACjI,cAAc;CACd,yBAAyB;CACzB,eAAe;AAChB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,WAAW;CACX,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,gBAAgB;CAChB,YAAY;CACZ,aAAa;CACb,gBAAgB;CAChB,eAAe;AAChB;;AAEA;CACC,gBAAgB;AACjB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,WAAW;CACX,YAAY;AACb;;AAEA;CACC,WAAW;CACX,YAAY;AACb;;AAEA,mCAAmC;AACnC;CACC,kBAAkB;CAClB,SAAS;CACT,aAAa;CACb,mBAAmB;CACnB,YAAY;AACb;;AAEA;CACC,wBAAwB;CACxB,kBAAkB;AACnB","sourcesContent":["#crms-container {\n\tposition: absolute;\n\tbottom: 0;\n\tleft: 0;\n\tz-index: 10;\n\tbackground: #fff;\n\tborder-radius: 5px;\n\toverflow: hidden;\n\tbox-shadow: 1px 1px 7px 0 #343434;\n}\n\n#crms-canvas-wrap {\n\tdisplay: flex;\n\tjustify-content: center;\n\tbackground: #d3d3d3;\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n\tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n/* screen share area selector */\n#backdrop-wrapper {\n\tposition: fixed;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tz-index: 1;\n}\n\n#drag-markers-container {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n}\n\n.draggable {\n\tposition: absolute;\n\twidth: 16px;\n\theight: 16px;\n\tcursor: move;\n\tz-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tmargin: 0 .75rem;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n.icon-btn {\n\tbackground: none;\n\tborder: none;\n\toutline: none;\n\tpadding: 2px 7px;\n\tcursor: pointer;\n}\n\n.icon-btn.s20 {\n\tpadding: 4px 9px;\n}\n\n.icon-btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.icon-btn.s24 > svg {\n\twidth: 24px;\n\theight: 24px;\n}\n\n.icon-btn.s20 > svg {\n\twidth: 20px;\n\theight: 20px;\n}\n\n/* end screen share area selector */\n#buttons {\n\tposition: absolute;\n\tbottom: 0;\n\tpadding: 1rem;\n\tbackground: #6a6a6a;\n\tz-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1474,15 +1565,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 class CropMyScreen {
-  // BACKDROP_COLOR;
-  // CROP_X;
-  // CROP_Y;
-  // CROP_W;
-  // CROP_H;
-  // START_X;
-  // START_Y;
-  // END_X;
-  // END_Y;
   constructor(options) {
     _defineProperty(this, "settings", void 0);
 
