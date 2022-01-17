@@ -1,28 +1,34 @@
 #crms-container {
-  position: absolute;
-  top: 70px;
-  left: 0;
-  /* right: 0; */
-  /* width: 300px;
-  height: 300px; */
-  z-index: 10;
-  border-radius: 5px;
-  /* overflow: hidden; */
-  box-shadow: 1px 1px 7px 0px #343434;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	/* right: 0; */
+	/* width: 300px;
+	height: 300px; */
+	z-index: 10;
+	border-radius: 5px;
+	overflow: hidden;
+	box-shadow: 1px 1px 7px 0 #343434;
 }
 
 #crms-popup {
-	
+
 }
 
 #crms-preview-header {
 	height: 30px;
 	cursor: grab;
+	display: flex;
+	justify-content: end;
+	align-items: center;
 }
 
 #crms-preview-footer {
 	height: 50px;
 	padding: 5px 10px;
+	display: flex;
+	justify-content: end;
+	align-items: center;
 }
 
 #crms-input {
@@ -32,35 +38,35 @@
 
 #crms-output {
 	display: block;
-  	background-color: #6a6a6a;
+	background-color: #6a6a6a;
 }
 
 /* #sharingScreen.visible {
   display: block;
 } */
 
- /* screen share area selector */
- #backdrop-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+/* screen share area selector */
+#backdrop-wrapper {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
 }
 
 #drag-markers-container {
-  position: absolute;
-  top: 0;
-  left: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
 }
 
 .draggable {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  cursor: move;
-  z-index: 2;
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	cursor: move;
+	z-index: 2;
 }
 
 .btn {
@@ -74,11 +80,12 @@
 	-ms-user-select: none;
 	user-select: none;
 	border: 1px solid #f8f9fa;
+	margin: 0 .75rem;
 	padding: .375rem .75rem;
 	font-size: 1rem;
 	line-height: 1.5;
 	border-radius: .25rem;
-	transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 	color: #212529;
 	background-color: #f8f9fa;
 	cursor: pointer;
@@ -94,18 +101,46 @@
 	background-color: #007bff;
 	border-color: #007bff;
 }
+
 .btn-primary:hover {
 	background-color: #0069d9;
 	border-color: #0062cc;
 }
 
+.icon-btn {
+	background: none;
+	border: none;
+	outline: none;
+	padding: 2px 7px;
+	cursor: pointer;
+}
+
+.icon-btn.s20 {
+	padding: 4px 9px;
+}
+
+.icon-btn:hover {
+	background-color: #e2e6ea;
+	border-color: #dae0e5;
+}
+
+.icon-btn.s24 > svg {
+	width: 24px;
+	height: 24px;
+}
+
+.icon-btn.s20 > svg {
+	width: 20px;
+	height: 20px;
+}
+
 /* end screen share area selector */
 #buttons {
-  position: absolute;
-  bottom: 0;
-  padding: 1rem;
-  background: #6a6a6a;
-  z-index: 999;
+	position: absolute;
+	bottom: 0;
+	padding: 1rem;
+	background: #6a6a6a;
+	z-index: 999;
 }
 
 .crms-hidden {

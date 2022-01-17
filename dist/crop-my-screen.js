@@ -1,6 +1,5 @@
 var CropMyScreen;
 /******/ (() => { // webpackBootstrap
-/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./src/aria-selector.js":
@@ -9,6 +8,7 @@ var CropMyScreen;
   \******************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ AriaSelector)
@@ -399,13 +399,23 @@ class AriaSelector {
   \************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Cropper)
 /* harmony export */ });
 /* harmony import */ var _aria_selector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./aria-selector */ "./src/aria-selector.js");
 /* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util */ "./src/util.js");
+/* harmony import */ var _assets_xmark_svg__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./assets/xmark.svg */ "./src/assets/xmark.svg");
+/* harmony import */ var _assets_xmark_svg__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_assets_xmark_svg__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./assets/window-minimize.svg */ "./src/assets/window-minimize.svg");
+/* harmony import */ var _assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./assets/window-maximize.svg */ "./src/assets/window-maximize.svg");
+/* harmony import */ var _assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_4__);
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
 
 
 
@@ -495,7 +505,9 @@ class Cropper {
   }
 
   stopStream() {
-    this.videoEl.pause();
+    const tracks = this.videoEl.srcObject.getTracks();
+    (tracks || []).forEach(t => t.stop());
+    this.videoEl.srcObject = null;
 
     this._togglePreviewer(false);
   }
@@ -537,14 +549,19 @@ class Cropper {
 
     const minimize = {
       id: withPrefix('btn-minimize'),
-      text: 'Minimize',
+      icon: (_assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_3___default()),
+      iconSize: 's20',
       callback: (() => {
         let minimized = false;
-        return () => {
+        return button => {
+          console.log(button);
+
           if (minimized) {
+            button.innerHTML = (_assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_3___default());
             canvas.classList.remove(withPrefix('hidden'));
             popupFooter.classList.remove(withPrefix('hidden'));
           } else {
+            button.innerHTML = (_assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_4___default());
             canvas.classList.add(withPrefix('hidden'));
             popupFooter.classList.add(withPrefix('hidden'));
           }
@@ -555,7 +572,8 @@ class Cropper {
     };
     const close = {
       id: withPrefix('btn-close'),
-      text: 'Close',
+      icon: (_assets_xmark_svg__WEBPACK_IMPORTED_MODULE_2___default()),
+      iconSize: 's24',
       callback: () => {
         this.stopStream();
         this.onStreamStopped();
@@ -635,17 +653,19 @@ class Cropper {
   _initHeaderButton(_ref) {
     let {
       id,
-      text,
-      callback
+      icon,
+      callback,
+      iconSize
     } = _ref;
     const btn = document.createElement('button');
     btn.setAttribute('id', id);
     btn.setAttribute('type', 'button');
-    btn.classList.add('crms-control');
-    btn.innerText = text;
+    btn.classList.add('crms-control', 'icon-btn');
+    iconSize && btn.classList.add(iconSize);
+    btn.innerHTML = icon;
 
-    btn.onclick = () => {
-      doCallback(callback);
+    btn.onclick = event => {
+      doCallback(callback, event.currentTarget);
     };
 
     return btn;
@@ -739,6 +759,7 @@ class Cropper {
   \*********************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "getUserAgent": () => (/* binding */ getUserAgent),
@@ -795,6 +816,7 @@ function getBrowserHeaderSize() {
   \******************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -808,7 +830,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "#crms-container {\n  position: absolute;\n  top: 70px;\n  left: 0;\n  /* right: 0; */\n  /* width: 300px;\n  height: 300px; */\n  z-index: 10;\n  border-radius: 5px;\n  /* overflow: hidden; */\n  box-shadow: 1px 1px 7px 0px #343434;\n}\n\n#crms-popup {\n\t\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n  \tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n /* screen share area selector */\n #backdrop-wrapper {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 1;\n}\n\n#drag-markers-container {\n  position: absolute;\n  top: 0;\n  left: 0;\n}\n\n.draggable {\n  position: absolute;\n  width: 16px;\n  height: 16px;\n  cursor: move;\n  z-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n/* end screen share area selector */\n#buttons {\n  position: absolute;\n  bottom: 0;\n  padding: 1rem;\n  background: #6a6a6a;\n  z-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n", "",{"version":3,"sources":["webpack://./src/css/styles.css"],"names":[],"mappings":"AAAA;EACE,kBAAkB;EAClB,SAAS;EACT,OAAO;EACP,cAAc;EACd;kBACgB;EAChB,WAAW;EACX,kBAAkB;EAClB,sBAAsB;EACtB,mCAAmC;AACrC;;AAEA;;AAEA;;AAEA;CACC,YAAY;CACZ,YAAY;AACb;;AAEA;CACC,YAAY;CACZ,iBAAiB;AAClB;;AAEA;CACC,aAAa;CACb,kBAAkB;AACnB;;AAEA;CACC,cAAc;GACZ,yBAAyB;AAC5B;;AAEA;;GAEG;;CAEF,+BAA+B;CAC/B;EACC,eAAe;EACf,MAAM;EACN,OAAO;EACP,WAAW;EACX,YAAY;EACZ,UAAU;AACZ;;AAEA;EACE,kBAAkB;EAClB,MAAM;EACN,OAAO;AACT;;AAEA;EACE,kBAAkB;EAClB,WAAW;EACX,YAAY;EACZ,YAAY;EACZ,UAAU;AACZ;;AAEA;CACC,qBAAqB;CACrB,gBAAgB;CAChB,kBAAkB;CAClB,mBAAmB;CACnB,sBAAsB;CACtB,yBAAyB;CACzB,sBAAsB;CACtB,qBAAqB;CACrB,iBAAiB;CACjB,yBAAyB;CACzB,uBAAuB;CACvB,eAAe;CACf,gBAAgB;CAChB,qBAAqB;CACrB,8HAA8H;CAC9H,cAAc;CACd,yBAAyB;CACzB,eAAe;AAChB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,WAAW;CACX,yBAAyB;CACzB,qBAAqB;AACtB;AACA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA,mCAAmC;AACnC;EACE,kBAAkB;EAClB,SAAS;EACT,aAAa;EACb,mBAAmB;EACnB,YAAY;AACd;;AAEA;CACC,wBAAwB;CACxB,kBAAkB;AACnB","sourcesContent":["#crms-container {\n  position: absolute;\n  top: 70px;\n  left: 0;\n  /* right: 0; */\n  /* width: 300px;\n  height: 300px; */\n  z-index: 10;\n  border-radius: 5px;\n  /* overflow: hidden; */\n  box-shadow: 1px 1px 7px 0px #343434;\n}\n\n#crms-popup {\n\t\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n  \tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n /* screen share area selector */\n #backdrop-wrapper {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 1;\n}\n\n#drag-markers-container {\n  position: absolute;\n  top: 0;\n  left: 0;\n}\n\n.draggable {\n  position: absolute;\n  width: 16px;\n  height: 16px;\n  cursor: move;\n  z-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n/* end screen share area selector */\n#buttons {\n  position: absolute;\n  bottom: 0;\n  padding: 1rem;\n  background: #6a6a6a;\n  z-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "#crms-container {\n\tposition: absolute;\n\tbottom: 0;\n\tleft: 0;\n\t/* right: 0; */\n\t/* width: 300px;\n\theight: 300px; */\n\tz-index: 10;\n\tborder-radius: 5px;\n\toverflow: hidden;\n\tbox-shadow: 1px 1px 7px 0 #343434;\n}\n\n#crms-popup {\n\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n\tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n/* screen share area selector */\n#backdrop-wrapper {\n\tposition: fixed;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tz-index: 1;\n}\n\n#drag-markers-container {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n}\n\n.draggable {\n\tposition: absolute;\n\twidth: 16px;\n\theight: 16px;\n\tcursor: move;\n\tz-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tmargin: 0 .75rem;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n.icon-btn {\n\tbackground: none;\n\tborder: none;\n\toutline: none;\n\tpadding: 2px 7px;\n\tcursor: pointer;\n}\n\n.icon-btn.s20 {\n\tpadding: 4px 9px;\n}\n\n.icon-btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.icon-btn.s24 > svg {\n\twidth: 24px;\n\theight: 24px;\n}\n\n.icon-btn.s20 > svg {\n\twidth: 20px;\n\theight: 20px;\n}\n\n/* end screen share area selector */\n#buttons {\n\tposition: absolute;\n\tbottom: 0;\n\tpadding: 1rem;\n\tbackground: #6a6a6a;\n\tz-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n", "",{"version":3,"sources":["webpack://./src/css/styles.css"],"names":[],"mappings":"AAAA;CACC,kBAAkB;CAClB,SAAS;CACT,OAAO;CACP,cAAc;CACd;iBACgB;CAChB,WAAW;CACX,kBAAkB;CAClB,gBAAgB;CAChB,iCAAiC;AAClC;;AAEA;;AAEA;;AAEA;CACC,YAAY;CACZ,YAAY;CACZ,aAAa;CACb,oBAAoB;CACpB,mBAAmB;AACpB;;AAEA;CACC,YAAY;CACZ,iBAAiB;CACjB,aAAa;CACb,oBAAoB;CACpB,mBAAmB;AACpB;;AAEA;CACC,aAAa;CACb,kBAAkB;AACnB;;AAEA;CACC,cAAc;CACd,yBAAyB;AAC1B;;AAEA;;GAEG;;AAEH,+BAA+B;AAC/B;CACC,eAAe;CACf,MAAM;CACN,OAAO;CACP,WAAW;CACX,YAAY;CACZ,UAAU;AACX;;AAEA;CACC,kBAAkB;CAClB,MAAM;CACN,OAAO;AACR;;AAEA;CACC,kBAAkB;CAClB,WAAW;CACX,YAAY;CACZ,YAAY;CACZ,UAAU;AACX;;AAEA;CACC,qBAAqB;CACrB,gBAAgB;CAChB,kBAAkB;CAClB,mBAAmB;CACnB,sBAAsB;CACtB,yBAAyB;CACzB,sBAAsB;CACtB,qBAAqB;CACrB,iBAAiB;CACjB,yBAAyB;CACzB,gBAAgB;CAChB,uBAAuB;CACvB,eAAe;CACf,gBAAgB;CAChB,qBAAqB;CACrB,iIAAiI;CACjI,cAAc;CACd,yBAAyB;CACzB,eAAe;AAChB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,WAAW;CACX,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,gBAAgB;CAChB,YAAY;CACZ,aAAa;CACb,gBAAgB;CAChB,eAAe;AAChB;;AAEA;CACC,gBAAgB;AACjB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,WAAW;CACX,YAAY;AACb;;AAEA;CACC,WAAW;CACX,YAAY;AACb;;AAEA,mCAAmC;AACnC;CACC,kBAAkB;CAClB,SAAS;CACT,aAAa;CACb,mBAAmB;CACnB,YAAY;AACb;;AAEA;CACC,wBAAwB;CACxB,kBAAkB;AACnB","sourcesContent":["#crms-container {\n\tposition: absolute;\n\tbottom: 0;\n\tleft: 0;\n\t/* right: 0; */\n\t/* width: 300px;\n\theight: 300px; */\n\tz-index: 10;\n\tborder-radius: 5px;\n\toverflow: hidden;\n\tbox-shadow: 1px 1px 7px 0 #343434;\n}\n\n#crms-popup {\n\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n\tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n/* screen share area selector */\n#backdrop-wrapper {\n\tposition: fixed;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tz-index: 1;\n}\n\n#drag-markers-container {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n}\n\n.draggable {\n\tposition: absolute;\n\twidth: 16px;\n\theight: 16px;\n\tcursor: move;\n\tz-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tmargin: 0 .75rem;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n.icon-btn {\n\tbackground: none;\n\tborder: none;\n\toutline: none;\n\tpadding: 2px 7px;\n\tcursor: pointer;\n}\n\n.icon-btn.s20 {\n\tpadding: 4px 9px;\n}\n\n.icon-btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.icon-btn.s24 > svg {\n\twidth: 24px;\n\theight: 24px;\n}\n\n.icon-btn.s20 > svg {\n\twidth: 20px;\n\theight: 20px;\n}\n\n/* end screen share area selector */\n#buttons {\n\tposition: absolute;\n\tbottom: 0;\n\tpadding: 1rem;\n\tbackground: #6a6a6a;\n\tz-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -821,6 +843,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, "#crms-container {\n  position: absolut
   \*****************************************************/
 /***/ ((module) => {
 
+"use strict";
 
 
 /*
@@ -932,6 +955,7 @@ module.exports = function (cssWithMappingToString) {
   \************************************************************/
 /***/ ((module) => {
 
+"use strict";
 
 
 module.exports = function (item) {
@@ -963,6 +987,7 @@ module.exports = function (item) {
   \****************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -1017,6 +1042,7 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
   \****************************************************************************/
 /***/ ((module) => {
 
+"use strict";
 
 
 var stylesInDOM = [];
@@ -1130,6 +1156,7 @@ module.exports = function (list, options) {
   \********************************************************************/
 /***/ ((module) => {
 
+"use strict";
 
 
 var memo = {};
@@ -1178,6 +1205,7 @@ module.exports = insertBySelector;
   \**********************************************************************/
 /***/ ((module) => {
 
+"use strict";
 
 
 /* istanbul ignore next  */
@@ -1198,6 +1226,7 @@ module.exports = insertStyleElement;
   \**********************************************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
+"use strict";
 
 
 /* istanbul ignore next  */
@@ -1219,6 +1248,7 @@ module.exports = setAttributesWithoutAttributes;
   \***************************************************************/
 /***/ ((module) => {
 
+"use strict";
 
 
 /* istanbul ignore next  */
@@ -1298,6 +1328,7 @@ module.exports = domAPI;
   \*********************************************************************/
 /***/ ((module) => {
 
+"use strict";
 
 
 /* istanbul ignore next  */
@@ -1314,6 +1345,36 @@ function styleTagTransform(css, styleElement) {
 }
 
 module.exports = styleTagTransform;
+
+/***/ }),
+
+/***/ "./src/assets/window-maximize.svg":
+/*!****************************************!*\
+  !*** ./src/assets/window-maximize.svg ***!
+  \****************************************/
+/***/ ((module) => {
+
+module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M7.724 65.49C13.36 55.11 21.79 46.47 32 40.56C39.63 36.15 48.25 33.26 57.46 32.33C59.61 32.11 61.79 32 64 32H448C483.3 32 512 60.65 512 96V416C512 451.3 483.3 480 448 480H64C28.65 480 0 451.3 0 416V96C0 93.79 .112 91.61 .3306 89.46C1.204 80.85 3.784 72.75 7.724 65.49V65.49zM48 416C48 424.8 55.16 432 64 432H448C456.8 432 464 424.8 464 416V224H48V416z\"></path></svg>"
+
+/***/ }),
+
+/***/ "./src/assets/window-minimize.svg":
+/*!****************************************!*\
+  !*** ./src/assets/window-minimize.svg ***!
+  \****************************************/
+/***/ ((module) => {
+
+module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\"><path d=\"M0 456C0 442.7 10.75 432 24 432H488C501.3 432 512 442.7 512 456C512 469.3 501.3 480 488 480H24C10.75 480 0 469.3 0 456z\"></path></svg>"
+
+/***/ }),
+
+/***/ "./src/assets/xmark.svg":
+/*!******************************!*\
+  !*** ./src/assets/xmark.svg ***!
+  \******************************/
+/***/ ((module) => {
+
+module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 320 512\"><path d=\"M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z\"></path></svg>"
 
 /***/ })
 
@@ -1386,8 +1447,9 @@ module.exports = styleTagTransform;
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
+"use strict";
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/

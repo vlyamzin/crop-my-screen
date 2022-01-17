@@ -1,5 +1,8 @@
 import AriaSelector from './aria-selector';
 import {getUserAgent, getScreenOffset, getBrowserHeaderSize} from './util';
+import xmarkSVG from './assets/xmark.svg';
+import minimizeSVG from './assets/window-minimize.svg';
+import restoreSVG from './assets/window-maximize.svg';
 
 let withPrefix;
 const doCallback = (callback, params) => {
@@ -73,7 +76,9 @@ export default class Cropper {
   }
 
   stopStream() {
-    this.videoEl.pause();
+    const tracks = this.videoEl.srcObject.getTracks();
+    (tracks || []).forEach(t => t.stop());
+    this.videoEl.srcObject = null;
     this._togglePreviewer(false);
   }
 
@@ -117,14 +122,18 @@ export default class Cropper {
     // HEADER BUTTONS
     const minimize = {
       id: withPrefix('btn-minimize'),
-      text: 'Minimize',
+      icon: minimizeSVG,
+      iconSize: 's20',
       callback: (() => {
         let minimized = false;
-        return () => {
+        return (button) => {
+          console.log(button);
           if (minimized) {
+            button.innerHTML = minimizeSVG;
             canvas.classList.remove(withPrefix('hidden'));
             popupFooter.classList.remove(withPrefix('hidden'));
           } else {
+            button.innerHTML = restoreSVG;
             canvas.classList.add(withPrefix('hidden'));
             popupFooter.classList.add(withPrefix('hidden'));
           }
@@ -134,7 +143,8 @@ export default class Cropper {
     };
     const close = {
       id: withPrefix('btn-close'),
-      text: 'Close',
+      icon: xmarkSVG,
+      iconSize: 's24',
       callback: () => {
         this.stopStream();
         this.onStreamStopped();
@@ -210,14 +220,15 @@ export default class Cropper {
     };
   }
   
-  _initHeaderButton({id, text, callback}) {
+  _initHeaderButton({id, icon, callback, iconSize}) {
     const btn = document.createElement('button');
     btn.setAttribute('id', id);
     btn.setAttribute('type', 'button');
-    btn.classList.add('crms-control');
-    btn.innerText = text;
-    btn.onclick = () => {
-      doCallback(callback);
+    btn.classList.add('crms-control', 'icon-btn');
+    iconSize && btn.classList.add(iconSize);
+    btn.innerHTML = icon;
+    btn.onclick = (event) => {
+      doCallback(callback, event.currentTarget);
     };
     return btn;
   }
