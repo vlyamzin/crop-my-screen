@@ -119,93 +119,12 @@ export default class Cropper {
     const popupHeader = this._createElement('div', withPrefix('preview-header'));
     const popupFooter = this._createElement('div', withPrefix('preview-footer'));
 
-    // HEADER BUTTONS
-    const minimize = {
-      id: withPrefix('btn-minimize'),
-      icon: minimizeSVG,
-      iconSize: 's20',
-      callback: (() => {
-        let minimized = false;
-        return (button) => {
-          console.log(button);
-          if (minimized) {
-            button.innerHTML = minimizeSVG;
-            canvas.classList.remove(withPrefix('hidden'));
-            popupFooter.classList.remove(withPrefix('hidden'));
-          } else {
-            button.innerHTML = restoreSVG;
-            canvas.classList.add(withPrefix('hidden'));
-            popupFooter.classList.add(withPrefix('hidden'));
-          }
-          minimized = !minimized;
-        };
-      })()
-    };
-    const close = {
-      id: withPrefix('btn-close'),
-      icon: xmarkSVG,
-      iconSize: 's24',
-      callback: () => {
-        this.stopStream();
-        this.onStreamStopped();
-      }
-    };
-
-    const selectArea = {
-      id: withPrefix('btn-select-area'),
-      text: 'Select Area',
-      primary: false,
-      visible: true,
-      group: this.buttonGroup['1'],
-      callback: () => {
-        const constraints = this._correctCoordinates(this.constraints, false);
-        this.ariaSelector.init(this.displaySurfaceType, constraints);
-        this._toggleButtons(2);
-      }
-    };
-    const cancelAreaSelection = {
-      id: withPrefix('btn-cancel-selection'),
-      text: 'Cancel',
-      primary: false,
-      visible: false,
-      group: this.buttonGroup['2'],
-      callback: () => {
-        this.ariaSelector.remove();
-        this._toggleButtons(1);
-      },
-    };
-    const applyAreaSelection = {
-      id: withPrefix('btn-apply-selection'),
-      text: 'Apply',
-      primary: true,
-      visible: false,
-      group: this.buttonGroup['2'],
-      callback: () => {
-        this.constraints = this._correctCoordinates(this.ariaSelector.getCoords(), true);
-        this.ariaSelector.remove();
-        this.canvas.width = this.constraints.dx;
-        this.canvas.height = this.constraints.dy;
-        this._toggleButtons(1);
-      },
-    };
-    const shareStart = {
-      id: withPrefix('btn-start-sharing'),
-      text: 'Start presentation',
-      primary: true,
-      group: this.buttonGroup['1'],
-      callback: () => {
-        const stream = canvas.captureStream();
-        this.onStreamStarted(stream);
-        this._togglePreviewer(false);
-      }
-    };
-
-    [minimize, close].forEach(btnSettings => {
-      let btn = this._initHeaderButton(btnSettings);
+    this._headerButtonsConfig.forEach(btnSettings => {
+      let btn = this._renderHeaderButton(btnSettings);
       popupHeader.appendChild(btn);
     });
 
-    [cancelAreaSelection, applyAreaSelection, selectArea, shareStart].forEach(btnSettings => {
+    this._footerButtonsConfig.forEach(btnSettings => {
       let btn = this._initPreviewButton(btnSettings);
       popupFooter.appendChild(btn);
     });
@@ -220,7 +139,7 @@ export default class Cropper {
     };
   }
   
-  _initHeaderButton({id, icon, callback, iconSize}) {
+  _renderHeaderButton({id, icon, callback, iconSize}) {
     const btn = document.createElement('button');
     btn.setAttribute('id', id);
     btn.setAttribute('type', 'button');
@@ -306,6 +225,92 @@ export default class Cropper {
     }
 
     return coordinates;
+  }
+
+  get _headerButtonsConfig() {
+    const minimize = {
+      id: withPrefix('btn-minimize'),
+      icon: minimizeSVG,
+      iconSize: 's20',
+      callback: (() => {
+        let minimized = false;
+        return (button) => {
+          const popupFooter = document.querySelector(`#${withPrefix('preview-footer')}`);
+          if (minimized) {
+            button.innerHTML = minimizeSVG;
+            this.canvas.classList.remove(withPrefix('hidden'));
+            popupFooter.classList.remove(withPrefix('hidden'));
+          } else {
+            button.innerHTML = restoreSVG;
+            this.canvas.classList.add(withPrefix('hidden'));
+            popupFooter.classList.add(withPrefix('hidden'));
+          }
+          minimized = !minimized;
+        };
+      })()
+    };
+    const close = {
+      id: withPrefix('btn-close'),
+      icon: xmarkSVG,
+      iconSize: 's24',
+      callback: () => {
+        this.stopStream();
+        this.onStreamStopped();
+      }
+    };
+    return [minimize, close];
+  }
+
+  get _footerButtonsConfig() {
+    const selectArea = {
+      id: withPrefix('btn-select-area'),
+      text: 'Select Area',
+      primary: false,
+      visible: true,
+      group: this.buttonGroup['1'],
+      callback: () => {
+        const constraints = this._correctCoordinates(this.constraints, false);
+        this.ariaSelector.init(this.displaySurfaceType, constraints);
+        this._toggleButtons(2);
+      }
+    };
+    const cancelAreaSelection = {
+      id: withPrefix('btn-cancel-selection'),
+      text: 'Cancel',
+      primary: false,
+      visible: false,
+      group: this.buttonGroup['2'],
+      callback: () => {
+        this.ariaSelector.remove();
+        this._toggleButtons(1);
+      },
+    };
+    const applyAreaSelection = {
+      id: withPrefix('btn-apply-selection'),
+      text: 'Apply',
+      primary: true,
+      visible: false,
+      group: this.buttonGroup['2'],
+      callback: () => {
+        this.constraints = this._correctCoordinates(this.ariaSelector.getCoords(), true);
+        this.ariaSelector.remove();
+        this.canvas.width = this.constraints.dx;
+        this.canvas.height = this.constraints.dy;
+        this._toggleButtons(1);
+      },
+    };
+    const shareStart = {
+      id: withPrefix('btn-start-sharing'),
+      text: 'Start presentation',
+      primary: true,
+      group: this.buttonGroup['1'],
+      callback: () => {
+        const stream = this.canvas.captureStream();
+        this.onStreamStarted(stream);
+        this._togglePreviewer(false);
+      }
+    };
+    return [cancelAreaSelection, applyAreaSelection, selectArea, shareStart];
   }
 
 }
