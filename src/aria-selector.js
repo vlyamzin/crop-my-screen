@@ -1,3 +1,4 @@
+import {withPrefix} from './util';
 
 export default class AriaSelector {
   resizing = false;
@@ -34,7 +35,7 @@ export default class AriaSelector {
       e.stopPropagation();
 
       // prevent area selection if a user initiated area resizing or clicks on buttons in the previewer
-      if (e.target.classList.contains('crms-control') || this.resizing) {
+      if (e.target.classList.contains(withPrefix('control')) || this.resizing) {
         return;
       }
 
@@ -48,9 +49,9 @@ export default class AriaSelector {
     this.areaSelectionEnd = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      
+
       // prevent area selection if a user clicks on buttons in the previewer
-      if (e.target.classList.contains('crms-control')) {
+      if (e.target.classList.contains(withPrefix('control'))) {
         return;
       }
 

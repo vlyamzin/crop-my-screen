@@ -1,3 +1,4 @@
+
 function getUserAgent() {
   let ua;
   const sUsrAg = navigator.userAgent;
@@ -37,5 +38,13 @@ function getBrowserHeaderSize() {
   return window.outerHeight - window.innerHeight;
 }
 
+function getRatio(width, height) {
+  return (width > height) ? (width / height) : (height / width);
+}
 
-export {getUserAgent, getBrowserHeaderSize, getScreenOffset};
+function withPrefix(id) {
+  return `${window.CropMyScreen.prefix}-${id}`;
+}
+
+
+export {getUserAgent, getBrowserHeaderSize, getScreenOffset, getRatio, withPrefix};

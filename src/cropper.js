@@ -1,12 +1,12 @@
 import AriaSelector from './aria-selector';
 import WindowManager from './window-manager';
-import {getUserAgent, getScreenOffset, getBrowserHeaderSize} from './util';
+import {getUserAgent, getScreenOffset, getBrowserHeaderSize, withPrefix} from './util';
 import xmarkSVG from './assets/xmark.svg';
 import minimizeSVG from './assets/window-minimize.svg';
 import restoreSVG from './assets/window-maximize.svg';
 
 
-let withPrefix;
+// let withPrefix;
 const doCallback = (callback, params) => {
   if (callback && typeof callback === 'function') {
     callback.call(this, params);
@@ -26,20 +26,14 @@ export default class Cropper {
     2: []
   };
 
-  _prefix;
   _containerId = 'container';
 
-  constructor(prefix) {
-    this._prefix = prefix;
-
-    withPrefix = (id) => {
-      return `${prefix}-${id}`;
-    };
+  constructor() {
     this.ariaSelector = new AriaSelector();
   }
 
   render() {
-    if (document.getElementById(`${this._prefix}-${this._containerId}`)) return;
+    if (document.getElementById(withPrefix(this._containerId))) return;
 
     this.containerEl = this._createElement('div', withPrefix(this._containerId));
     this.videoEl = this._createElement('video', withPrefix('input'));
@@ -77,6 +71,7 @@ export default class Cropper {
     this.canvas.width = dx;
     this.canvas.height = dy;
     this._togglePreviewer(true);
+    this.windowManager.fitCanvas(this.canvas);
   }
 
   stopStream() {
@@ -307,6 +302,7 @@ export default class Cropper {
         this.ariaSelector.remove();
         this.canvas.width = this.constraints.dx;
         this.canvas.height = this.constraints.dy;
+        this.windowManager.fitCanvas(this.canvas);
         this._toggleButtons(1);
       },
     };

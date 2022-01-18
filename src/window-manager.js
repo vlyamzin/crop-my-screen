@@ -1,3 +1,5 @@
+import {getRatio, withPrefix} from './util';
+
 export default class WindowManager {
   _isMoving;
   _startCoords;
@@ -11,7 +13,7 @@ export default class WindowManager {
     this._container = container;
     this._dragZone = container.querySelector('.window-move');
 
-    if (!this._container || !this._dragZone){
+    if (!this._container || !this._dragZone) {
       console.error('WindowManager: Container is not available');
       throw new Error('WindowManager: Container is not available');
     }
@@ -28,6 +30,31 @@ export default class WindowManager {
     this._dragZone.addEventListener('mousedown', this._mouseDown.bind(this), false);
     document.addEventListener('mousemove', this._moveMove.bind(this), false);
     document.addEventListener('mouseup', this._mouseUp.bind(this), false);
+  }
+
+  fitCanvas(canvasEl) {
+    let headerHeight, footerHeight;
+
+    try {
+      headerHeight = this._container.querySelector(`#${withPrefix('preview-header')}`).clientHeight;
+      footerHeight = this._container.querySelector(`#${withPrefix('preview-footer')}`).clientHeight;
+    } catch (e) {
+      console.error(e);
+      throw new Error('WindowManager: Can\'t obtaint header & footer height');
+    }
+
+    const containerWidth = this._container.clientWidth;
+    const containerHeight = this._container.clientHeight - (headerHeight + footerHeight);
+    const containerRatio = getRatio(containerWidth,containerHeight);
+    const canvasRatio = getRatio(canvasEl.width, canvasEl.height);
+
+
+    if (containerRatio > canvasRatio) {
+      canvasEl.classList.add('h100');
+      canvasEl.classList.remove('w100');
+    } else {
+      canvasEl.classList.add('w100', 'h100');
+    }
   }
 
   destroy() {

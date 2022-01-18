@@ -13,7 +13,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ AriaSelector)
 /* harmony export */ });
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util */ "./src/util.js");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 class AriaSelector {
   constructor() {
@@ -62,7 +64,7 @@ class AriaSelector {
       e.preventDefault();
       e.stopPropagation(); // prevent area selection if a user initiated area resizing or clicks on buttons in the previewer
 
-      if (e.target.classList.contains('crms-control') || this.resizing) {
+      if (e.target.classList.contains((0,_util__WEBPACK_IMPORTED_MODULE_0__.withPrefix)('control')) || this.resizing) {
         return;
       }
 
@@ -77,7 +79,7 @@ class AriaSelector {
       e.preventDefault();
       e.stopPropagation(); // prevent area selection if a user clicks on buttons in the previewer
 
-      if (e.target.classList.contains('crms-control')) {
+      if (e.target.classList.contains((0,_util__WEBPACK_IMPORTED_MODULE_0__.withPrefix)('control'))) {
         return;
       }
 
@@ -407,8 +409,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-
-let withPrefix;
+ // let withPrefix;
 
 const doCallback = (callback, params) => {
   if (callback && typeof callback === 'function') {
@@ -417,7 +418,7 @@ const doCallback = (callback, params) => {
 };
 
 class Cropper {
-  constructor(prefix) {
+  constructor() {
     _defineProperty(this, "constraints", void 0);
 
     _defineProperty(this, "ariaSelector", void 0);
@@ -437,24 +438,16 @@ class Cropper {
       2: []
     });
 
-    _defineProperty(this, "_prefix", void 0);
-
     _defineProperty(this, "_containerId", 'container');
-
-    this._prefix = prefix;
-
-    withPrefix = id => {
-      return `${prefix}-${id}`;
-    };
 
     this.ariaSelector = new _aria_selector__WEBPACK_IMPORTED_MODULE_0__["default"]();
   }
 
   render() {
-    if (document.getElementById(`${this._prefix}-${this._containerId}`)) return;
-    this.containerEl = this._createElement('div', withPrefix(this._containerId));
-    this.videoEl = this._createElement('video', withPrefix('input'));
-    this.canvas = this._createElement('canvas', withPrefix('output'));
+    if (document.getElementById((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)(this._containerId))) return;
+    this.containerEl = this._createElement('div', (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)(this._containerId));
+    this.videoEl = this._createElement('video', (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('input'));
+    this.canvas = this._createElement('canvas', (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('output'));
 
     const popup = this._initPreviewer(this.canvas);
 
@@ -492,6 +485,8 @@ class Cropper {
     this.canvas.height = dy;
 
     this._togglePreviewer(true);
+
+    this.windowManager.fitCanvas(this.canvas);
   }
 
   stopStream() {
@@ -532,13 +527,13 @@ class Cropper {
   }
 
   _initPreviewer(canvas) {
-    const popup = this._createElement('div', withPrefix('preview'));
+    const popup = this._createElement('div', (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('preview'));
 
-    const canvasWrap = this._createElement('div', withPrefix('canvas-wrap'));
+    const canvasWrap = this._createElement('div', (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('canvas-wrap'));
 
-    const popupHeader = this._createElement('div', withPrefix('preview-header'));
+    const popupHeader = this._createElement('div', (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('preview-header'));
 
-    const popupFooter = this._createElement('div', withPrefix('preview-footer'));
+    const popupFooter = this._createElement('div', (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('preview-footer'));
 
     popupHeader.classList.add('window-move');
 
@@ -603,26 +598,26 @@ class Cropper {
     };
 
     if (visible === false) {
-      btn.classList.add(withPrefix('hidden'));
+      btn.classList.add((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('hidden'));
     }
 
     return btn;
   }
 
   _togglePreviewer(status) {
-    status ? this.containerEl.classList.remove(withPrefix('hidden')) : this.containerEl.classList.add(withPrefix('hidden'));
+    status ? this.containerEl.classList.remove((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('hidden')) : this.containerEl.classList.add((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('hidden'));
   }
 
   _toggleButtons(status) {
     if (status === 1) {
-      this.buttonGroup['1'].forEach(btn => btn.classList.remove(withPrefix('hidden')));
-      this.buttonGroup['2'].forEach(btn => btn.classList.add(withPrefix('hidden')));
+      this.buttonGroup['1'].forEach(btn => btn.classList.remove((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('hidden')));
+      this.buttonGroup['2'].forEach(btn => btn.classList.add((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('hidden')));
       return;
     }
 
     if (status === 2) {
-      this.buttonGroup['2'].forEach(btn => btn.classList.remove(withPrefix('hidden')));
-      this.buttonGroup['1'].forEach(btn => btn.classList.add(withPrefix('hidden')));
+      this.buttonGroup['2'].forEach(btn => btn.classList.remove((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('hidden')));
+      this.buttonGroup['1'].forEach(btn => btn.classList.add((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('hidden')));
     }
   } // correct coordinates based on screen-sharing type (the whole screen or browser/tab only)
   // 'monitor' is the whole screen
@@ -661,22 +656,22 @@ class Cropper {
 
   get _headerButtonsConfig() {
     const minimize = {
-      id: withPrefix('btn-minimize'),
+      id: (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('btn-minimize'),
       icon: (_assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_4___default()),
       iconSize: 's20',
       callback: (() => {
         let minimized = false;
         return button => {
-          const popupFooter = document.querySelector(`#${withPrefix('preview-footer')}`);
+          const popupFooter = document.querySelector(`#${(0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('preview-footer')}`);
 
           if (minimized) {
             button.innerHTML = (_assets_window_minimize_svg__WEBPACK_IMPORTED_MODULE_4___default());
-            this.canvas.classList.remove(withPrefix('hidden'));
-            popupFooter.classList.remove(withPrefix('hidden'));
+            this.canvas.classList.remove((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('hidden'));
+            popupFooter.classList.remove((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('hidden'));
           } else {
             button.innerHTML = (_assets_window_maximize_svg__WEBPACK_IMPORTED_MODULE_5___default());
-            this.canvas.classList.add(withPrefix('hidden'));
-            popupFooter.classList.add(withPrefix('hidden'));
+            this.canvas.classList.add((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('hidden'));
+            popupFooter.classList.add((0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('hidden'));
           }
 
           minimized = !minimized;
@@ -684,7 +679,7 @@ class Cropper {
       })()
     };
     const close = {
-      id: withPrefix('btn-close'),
+      id: (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('btn-close'),
       icon: (_assets_xmark_svg__WEBPACK_IMPORTED_MODULE_3___default()),
       iconSize: 's24',
       callback: () => {
@@ -697,7 +692,7 @@ class Cropper {
 
   get _footerButtonsConfig() {
     const selectArea = {
-      id: withPrefix('btn-select-area'),
+      id: (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('btn-select-area'),
       text: 'Select Area',
       primary: false,
       visible: true,
@@ -711,7 +706,7 @@ class Cropper {
       }
     };
     const cancelAreaSelection = {
-      id: withPrefix('btn-cancel-selection'),
+      id: (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('btn-cancel-selection'),
       text: 'Cancel',
       primary: false,
       visible: false,
@@ -723,7 +718,7 @@ class Cropper {
       }
     };
     const applyAreaSelection = {
-      id: withPrefix('btn-apply-selection'),
+      id: (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('btn-apply-selection'),
       text: 'Apply',
       primary: true,
       visible: false,
@@ -733,12 +728,13 @@ class Cropper {
         this.ariaSelector.remove();
         this.canvas.width = this.constraints.dx;
         this.canvas.height = this.constraints.dy;
+        this.windowManager.fitCanvas(this.canvas);
 
         this._toggleButtons(1);
       }
     };
     const shareStart = {
-      id: withPrefix('btn-start-sharing'),
+      id: (0,_util__WEBPACK_IMPORTED_MODULE_2__.withPrefix)('btn-start-sharing'),
       text: 'Start presentation',
       primary: true,
       group: this.buttonGroup['1'],
@@ -767,7 +763,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "getUserAgent": () => (/* binding */ getUserAgent),
 /* harmony export */   "getBrowserHeaderSize": () => (/* binding */ getBrowserHeaderSize),
-/* harmony export */   "getScreenOffset": () => (/* binding */ getScreenOffset)
+/* harmony export */   "getScreenOffset": () => (/* binding */ getScreenOffset),
+/* harmony export */   "getRatio": () => (/* binding */ getRatio),
+/* harmony export */   "withPrefix": () => (/* binding */ withPrefix)
 /* harmony export */ });
 function getUserAgent() {
   let ua;
@@ -809,6 +807,14 @@ function getBrowserHeaderSize() {
   return window.outerHeight - window.innerHeight;
 }
 
+function getRatio(width, height) {
+  return width > height ? width / height : height / width;
+}
+
+function withPrefix(id) {
+  return `${window.CropMyScreen.prefix}-${id}`;
+}
+
 
 
 /***/ }),
@@ -824,7 +830,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ WindowManager)
 /* harmony export */ });
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util */ "./src/util.js");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 class WindowManager {
   constructor(container) {
@@ -869,6 +877,30 @@ class WindowManager {
 
     document.addEventListener('mousemove', this._moveMove.bind(this), false);
     document.addEventListener('mouseup', this._mouseUp.bind(this), false);
+  }
+
+  fitCanvas(canvasEl) {
+    let headerHeight, footerHeight;
+
+    try {
+      headerHeight = this._container.querySelector(`#${(0,_util__WEBPACK_IMPORTED_MODULE_0__.withPrefix)('preview-header')}`).clientHeight;
+      footerHeight = this._container.querySelector(`#${(0,_util__WEBPACK_IMPORTED_MODULE_0__.withPrefix)('preview-footer')}`).clientHeight;
+    } catch (e) {
+      console.error(e);
+      throw new Error('WindowManager: Can\'t obtaint header & footer height');
+    }
+
+    const containerWidth = this._container.clientWidth;
+    const containerHeight = this._container.clientHeight - (headerHeight + footerHeight);
+    const containerRatio = (0,_util__WEBPACK_IMPORTED_MODULE_0__.getRatio)(containerWidth, containerHeight);
+    const canvasRatio = (0,_util__WEBPACK_IMPORTED_MODULE_0__.getRatio)(canvasEl.width, canvasEl.height);
+
+    if (containerRatio > canvasRatio) {
+      canvasEl.classList.add('h100');
+      canvasEl.classList.remove('w100');
+    } else {
+      canvasEl.classList.add('w100', 'h100');
+    }
   }
 
   destroy() {
@@ -930,7 +962,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "#crms-container {\n\tposition: absolute;\n\tbottom: 0;\n\tleft: 0;\n\tz-index: 10;\n\tbackground: #fff;\n\tborder-radius: 5px;\n\toverflow: hidden;\n\tbox-shadow: 1px 1px 7px 0 #343434;\n}\n\n#crms-canvas-wrap {\n\tdisplay: flex;\n\tjustify-content: center;\n\tbackground: #d3d3d3;\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n\tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n/* screen share area selector */\n#backdrop-wrapper {\n\tposition: fixed;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tz-index: 1;\n}\n\n#drag-markers-container {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n}\n\n.draggable {\n\tposition: absolute;\n\twidth: 16px;\n\theight: 16px;\n\tcursor: move;\n\tz-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tmargin: 0 .75rem;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n.icon-btn {\n\tbackground: none;\n\tborder: none;\n\toutline: none;\n\tpadding: 2px 7px;\n\tcursor: pointer;\n}\n\n.icon-btn.s20 {\n\tpadding: 4px 9px;\n}\n\n.icon-btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.icon-btn.s24 > svg {\n\twidth: 24px;\n\theight: 24px;\n}\n\n.icon-btn.s20 > svg {\n\twidth: 20px;\n\theight: 20px;\n}\n\n/* end screen share area selector */\n#buttons {\n\tposition: absolute;\n\tbottom: 0;\n\tpadding: 1rem;\n\tbackground: #6a6a6a;\n\tz-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n", "",{"version":3,"sources":["webpack://./src/css/styles.css"],"names":[],"mappings":"AAAA;CACC,kBAAkB;CAClB,SAAS;CACT,OAAO;CACP,WAAW;CACX,gBAAgB;CAChB,kBAAkB;CAClB,gBAAgB;CAChB,iCAAiC;AAClC;;AAEA;CACC,aAAa;CACb,uBAAuB;CACvB,mBAAmB;AACpB;;AAEA;CACC,YAAY;CACZ,YAAY;CACZ,aAAa;CACb,oBAAoB;CACpB,mBAAmB;AACpB;;AAEA;CACC,YAAY;CACZ,iBAAiB;CACjB,aAAa;CACb,oBAAoB;CACpB,mBAAmB;AACpB;;AAEA;CACC,aAAa;CACb,kBAAkB;AACnB;;AAEA;CACC,cAAc;CACd,yBAAyB;AAC1B;;AAEA;;GAEG;;AAEH,+BAA+B;AAC/B;CACC,eAAe;CACf,MAAM;CACN,OAAO;CACP,WAAW;CACX,YAAY;CACZ,UAAU;AACX;;AAEA;CACC,kBAAkB;CAClB,MAAM;CACN,OAAO;AACR;;AAEA;CACC,kBAAkB;CAClB,WAAW;CACX,YAAY;CACZ,YAAY;CACZ,UAAU;AACX;;AAEA;CACC,qBAAqB;CACrB,gBAAgB;CAChB,kBAAkB;CAClB,mBAAmB;CACnB,sBAAsB;CACtB,yBAAyB;CACzB,sBAAsB;CACtB,qBAAqB;CACrB,iBAAiB;CACjB,yBAAyB;CACzB,gBAAgB;CAChB,uBAAuB;CACvB,eAAe;CACf,gBAAgB;CAChB,qBAAqB;CACrB,iIAAiI;CACjI,cAAc;CACd,yBAAyB;CACzB,eAAe;AAChB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,WAAW;CACX,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,gBAAgB;CAChB,YAAY;CACZ,aAAa;CACb,gBAAgB;CAChB,eAAe;AAChB;;AAEA;CACC,gBAAgB;AACjB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,WAAW;CACX,YAAY;AACb;;AAEA;CACC,WAAW;CACX,YAAY;AACb;;AAEA,mCAAmC;AACnC;CACC,kBAAkB;CAClB,SAAS;CACT,aAAa;CACb,mBAAmB;CACnB,YAAY;AACb;;AAEA;CACC,wBAAwB;CACxB,kBAAkB;AACnB","sourcesContent":["#crms-container {\n\tposition: absolute;\n\tbottom: 0;\n\tleft: 0;\n\tz-index: 10;\n\tbackground: #fff;\n\tborder-radius: 5px;\n\toverflow: hidden;\n\tbox-shadow: 1px 1px 7px 0 #343434;\n}\n\n#crms-canvas-wrap {\n\tdisplay: flex;\n\tjustify-content: center;\n\tbackground: #d3d3d3;\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n\tdisplay: flex;\n\tjustify-content: end;\n\talign-items: center;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n\tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n/* screen share area selector */\n#backdrop-wrapper {\n\tposition: fixed;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tz-index: 1;\n}\n\n#drag-markers-container {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n}\n\n.draggable {\n\tposition: absolute;\n\twidth: 16px;\n\theight: 16px;\n\tcursor: move;\n\tz-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tmargin: 0 .75rem;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n.icon-btn {\n\tbackground: none;\n\tborder: none;\n\toutline: none;\n\tpadding: 2px 7px;\n\tcursor: pointer;\n}\n\n.icon-btn.s20 {\n\tpadding: 4px 9px;\n}\n\n.icon-btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.icon-btn.s24 > svg {\n\twidth: 24px;\n\theight: 24px;\n}\n\n.icon-btn.s20 > svg {\n\twidth: 20px;\n\theight: 20px;\n}\n\n/* end screen share area selector */\n#buttons {\n\tposition: absolute;\n\tbottom: 0;\n\tpadding: 1rem;\n\tbackground: #6a6a6a;\n\tz-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "#crms-container {\n\tposition: absolute;\n\tleft: 0;\n\tz-index: 10;\n\tbackground: #fff;\n\tborder-radius: 5px;\n\toverflow: hidden;\n\tbox-shadow: 1px 1px 7px 0 #343434;\n\twidth: 500px;\n\theight: 400px;\n}\n\n#crms-canvas-wrap {\n\tdisplay: flex;\n\tjustify-content: center;\n\tbackground: #d3d3d3;\n\tmax-width: 500px;\n\tmax-height: 320px;\n}\n\n#crms-preview {\n\twidth: 100%;\n\theight: 100%;\n\tdisplay: flex;\n\tflex-direction: column;\n\tjustify-content: space-between;\n\tbackground: #d3d3d3;\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n\tdisplay: flex;\n\tjustify-content: flex-end;\n\talign-items: center;\n\tbackground: #fff;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n\tdisplay: flex;\n\tjustify-content: flex-end;\n\talign-items: center;\n\tbackground: #fff;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n\tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n/* screen share area selector */\n#backdrop-wrapper {\n\tposition: fixed;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tz-index: 1;\n}\n\n#drag-markers-container {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n}\n\n.draggable {\n\tposition: absolute;\n\twidth: 16px;\n\theight: 16px;\n\tcursor: move;\n\tz-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tmargin: 0 .75rem;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n.icon-btn {\n\tbackground: none;\n\tborder: none;\n\toutline: none;\n\tpadding: 2px 7px;\n\tcursor: pointer;\n}\n\n.icon-btn.s20 {\n\tpadding: 4px 9px;\n}\n\n.icon-btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.icon-btn.s24 > svg {\n\twidth: 24px;\n\theight: 24px;\n}\n\n.icon-btn.s20 > svg {\n\twidth: 20px;\n\theight: 20px;\n}\n\n/* end screen share area selector */\n#buttons {\n\tposition: absolute;\n\tbottom: 0;\n\tpadding: 1rem;\n\tbackground: #6a6a6a;\n\tz-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n\n.w100 {\n\twidth: 100%;\n}\n\n.h100 {\n\theight: 100%;\n}\n", "",{"version":3,"sources":["webpack://./src/css/styles.css"],"names":[],"mappings":"AAAA;CACC,kBAAkB;CAClB,OAAO;CACP,WAAW;CACX,gBAAgB;CAChB,kBAAkB;CAClB,gBAAgB;CAChB,iCAAiC;CACjC,YAAY;CACZ,aAAa;AACd;;AAEA;CACC,aAAa;CACb,uBAAuB;CACvB,mBAAmB;CACnB,gBAAgB;CAChB,iBAAiB;AAClB;;AAEA;CACC,WAAW;CACX,YAAY;CACZ,aAAa;CACb,sBAAsB;CACtB,8BAA8B;CAC9B,mBAAmB;AACpB;;AAEA;CACC,YAAY;CACZ,YAAY;CACZ,aAAa;CACb,yBAAyB;CACzB,mBAAmB;CACnB,gBAAgB;AACjB;;AAEA;CACC,YAAY;CACZ,iBAAiB;CACjB,aAAa;CACb,yBAAyB;CACzB,mBAAmB;CACnB,gBAAgB;AACjB;;AAEA;CACC,aAAa;CACb,kBAAkB;AACnB;;AAEA;CACC,cAAc;CACd,yBAAyB;AAC1B;;AAEA;;GAEG;;AAEH,+BAA+B;AAC/B;CACC,eAAe;CACf,MAAM;CACN,OAAO;CACP,WAAW;CACX,YAAY;CACZ,UAAU;AACX;;AAEA;CACC,kBAAkB;CAClB,MAAM;CACN,OAAO;AACR;;AAEA;CACC,kBAAkB;CAClB,WAAW;CACX,YAAY;CACZ,YAAY;CACZ,UAAU;AACX;;AAEA;CACC,qBAAqB;CACrB,gBAAgB;CAChB,kBAAkB;CAClB,mBAAmB;CACnB,sBAAsB;CACtB,yBAAyB;CACzB,sBAAsB;CACtB,qBAAqB;CACrB,iBAAiB;CACjB,yBAAyB;CACzB,gBAAgB;CAChB,uBAAuB;CACvB,eAAe;CACf,gBAAgB;CAChB,qBAAqB;CACrB,iIAAiI;CACjI,cAAc;CACd,yBAAyB;CACzB,eAAe;AAChB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,WAAW;CACX,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,gBAAgB;CAChB,YAAY;CACZ,aAAa;CACb,gBAAgB;CAChB,eAAe;AAChB;;AAEA;CACC,gBAAgB;AACjB;;AAEA;CACC,yBAAyB;CACzB,qBAAqB;AACtB;;AAEA;CACC,WAAW;CACX,YAAY;AACb;;AAEA;CACC,WAAW;CACX,YAAY;AACb;;AAEA,mCAAmC;AACnC;CACC,kBAAkB;CAClB,SAAS;CACT,aAAa;CACb,mBAAmB;CACnB,YAAY;AACb;;AAEA;CACC,wBAAwB;CACxB,kBAAkB;AACnB;;AAEA;CACC,WAAW;AACZ;;AAEA;CACC,YAAY;AACb","sourcesContent":["#crms-container {\n\tposition: absolute;\n\tleft: 0;\n\tz-index: 10;\n\tbackground: #fff;\n\tborder-radius: 5px;\n\toverflow: hidden;\n\tbox-shadow: 1px 1px 7px 0 #343434;\n\twidth: 500px;\n\theight: 400px;\n}\n\n#crms-canvas-wrap {\n\tdisplay: flex;\n\tjustify-content: center;\n\tbackground: #d3d3d3;\n\tmax-width: 500px;\n\tmax-height: 320px;\n}\n\n#crms-preview {\n\twidth: 100%;\n\theight: 100%;\n\tdisplay: flex;\n\tflex-direction: column;\n\tjustify-content: space-between;\n\tbackground: #d3d3d3;\n}\n\n#crms-preview-header {\n\theight: 30px;\n\tcursor: grab;\n\tdisplay: flex;\n\tjustify-content: flex-end;\n\talign-items: center;\n\tbackground: #fff;\n}\n\n#crms-preview-footer {\n\theight: 50px;\n\tpadding: 5px 10px;\n\tdisplay: flex;\n\tjustify-content: flex-end;\n\talign-items: center;\n\tbackground: #fff;\n}\n\n#crms-input {\n\tdisplay: none;\n\tvisibility: hidden;\n}\n\n#crms-output {\n\tdisplay: block;\n\tbackground-color: #6a6a6a;\n}\n\n/* #sharingScreen.visible {\n  display: block;\n} */\n\n/* screen share area selector */\n#backdrop-wrapper {\n\tposition: fixed;\n\ttop: 0;\n\tleft: 0;\n\twidth: 100%;\n\theight: 100%;\n\tz-index: 1;\n}\n\n#drag-markers-container {\n\tposition: absolute;\n\ttop: 0;\n\tleft: 0;\n}\n\n.draggable {\n\tposition: absolute;\n\twidth: 16px;\n\theight: 16px;\n\tcursor: move;\n\tz-index: 2;\n}\n\n.btn {\n\tdisplay: inline-block;\n\tfont-weight: 400;\n\ttext-align: center;\n\twhite-space: nowrap;\n\tvertical-align: middle;\n\t-webkit-user-select: none;\n\t-moz-user-select: none;\n\t-ms-user-select: none;\n\tuser-select: none;\n\tborder: 1px solid #f8f9fa;\n\tmargin: 0 .75rem;\n\tpadding: .375rem .75rem;\n\tfont-size: 1rem;\n\tline-height: 1.5;\n\tborder-radius: .25rem;\n\ttransition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;\n\tcolor: #212529;\n\tbackground-color: #f8f9fa;\n\tcursor: pointer;\n}\n\n.btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.btn-primary {\n\tcolor: #fff;\n\tbackground-color: #007bff;\n\tborder-color: #007bff;\n}\n\n.btn-primary:hover {\n\tbackground-color: #0069d9;\n\tborder-color: #0062cc;\n}\n\n.icon-btn {\n\tbackground: none;\n\tborder: none;\n\toutline: none;\n\tpadding: 2px 7px;\n\tcursor: pointer;\n}\n\n.icon-btn.s20 {\n\tpadding: 4px 9px;\n}\n\n.icon-btn:hover {\n\tbackground-color: #e2e6ea;\n\tborder-color: #dae0e5;\n}\n\n.icon-btn.s24 > svg {\n\twidth: 24px;\n\theight: 24px;\n}\n\n.icon-btn.s20 > svg {\n\twidth: 20px;\n\theight: 20px;\n}\n\n/* end screen share area selector */\n#buttons {\n\tposition: absolute;\n\tbottom: 0;\n\tpadding: 1rem;\n\tbackground: #6a6a6a;\n\tz-index: 999;\n}\n\n.crms-hidden {\n\tdisplay: none !important;\n\tvisibility: hidden;\n}\n\n.w100 {\n\twidth: 100%;\n}\n\n.h100 {\n\theight: 100%;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
