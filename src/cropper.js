@@ -6,7 +6,6 @@ import minimizeSVG from './assets/window-minimize.svg';
 import restoreSVG from './assets/window-maximize.svg';
 
 
-// let withPrefix;
 const doCallback = (callback, params) => {
   if (callback && typeof callback === 'function') {
     callback.call(this, params);
@@ -32,10 +31,11 @@ export default class Cropper {
     this.ariaSelector = new AriaSelector();
   }
 
-  render() {
+  render({customClass, backdropColor}) {
     if (document.getElementById(withPrefix(this._containerId))) return;
 
     this.containerEl = this._createElement('div', withPrefix(this._containerId));
+    customClass && this.containerEl.classList.add(customClass);
     this.videoEl = this._createElement('video', withPrefix('input'));
     this.canvas = this._createElement('canvas', withPrefix('output'));
     const popup = this._initPreviewer(this.canvas);
@@ -49,6 +49,7 @@ export default class Cropper {
 
     document.body.appendChild(this.containerEl);
     this.windowManager = new WindowManager(this.containerEl);
+    this.ariaSelector.BACKDROP_COLOR = backdropColor;
   }
 
   startStream(stream, constraints) {
@@ -71,6 +72,8 @@ export default class Cropper {
     this.canvas.width = dx;
     this.canvas.height = dy;
     this._togglePreviewer(true);
+
+    this.windowManager.init();
     this.windowManager.fitCanvas(this.canvas);
   }
 
@@ -87,8 +90,12 @@ export default class Cropper {
     this.containerEl.remove();
   }
 
+  /**
+   * Event. Notifies when crop is done and stream is ready
+   * @param {MediaStream} stream - Cropped stream
+   */
+  // eslint-disable-next-line
   onStreamStarted(stream) {
-    console.log(stream);
   }
 
   onStreamStopped() {
@@ -151,8 +158,11 @@ export default class Cropper {
     btn.classList.add('crms-control', 'icon-btn');
     iconSize && btn.classList.add(iconSize);
     btn.innerHTML = icon;
-    btn.onclick = (event) => {
+    // prevent window reposition event fire
+    btn.onmousedown = (event) => {
       event.stopPropagation();
+    };
+    btn.onclick = (event) => {
       doCallback(callback, event.currentTarget);
     };
     return btn;
@@ -241,15 +251,12 @@ export default class Cropper {
       callback: (() => {
         let minimized = false;
         return (button) => {
-          const popupFooter = document.querySelector(`#${withPrefix('preview-footer')}`);
           if (minimized) {
             button.innerHTML = minimizeSVG;
-            this.canvas.classList.remove(withPrefix('hidden'));
-            popupFooter.classList.remove(withPrefix('hidden'));
+            this.windowManager.minimize(false);
           } else {
             button.innerHTML = restoreSVG;
-            this.canvas.classList.add(withPrefix('hidden'));
-            popupFooter.classList.add(withPrefix('hidden'));
+            this.windowManager.minimize(true);
           }
           minimized = !minimized;
         };

@@ -12,7 +12,7 @@ export default class AriaSelector {
   END_Y;
   CROP_W;
   CROP_H;
-  BACKDROP_COLOR = '#00000073';
+  BACKDROP_COLOR;
 
   init(displaySurface, constraints) {
     if (!constraints) {

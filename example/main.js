@@ -8,7 +8,8 @@
     cropX: constraints.x,
     cropY: constraints.y,
     cropW: constraints.width,
-    cropH: constraints.height
+    cropH: constraints.height,
+    backdropColor: '#ffffff73'
   });
 
   cropper.init();

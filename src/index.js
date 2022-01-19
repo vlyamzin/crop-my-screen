@@ -17,7 +17,10 @@ class CropMyScreen {
       this.cropper = new Cropper(CropMyScreen.prefix);
     }
 
-    this.cropper.render();
+    this.cropper.render({
+      customClass: this.settings.previewerClass,
+      backdropColor: this.settings.backdropColor,
+    });
 
   }
 
@@ -57,9 +60,6 @@ class CropMyScreen {
       cropY: 0,
       cropW: 640,
       cropH: 480,
-      startX: 0,
-      startY: 0,
-      selectArea: false,
       previewerClass: ''
     };
   }

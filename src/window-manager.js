@@ -17,8 +17,6 @@ export default class WindowManager {
       console.error('WindowManager: Container is not available');
       throw new Error('WindowManager: Container is not available');
     }
-
-    this.init();
   }
 
   init() {
@@ -27,24 +25,24 @@ export default class WindowManager {
     this._translateOffset = {x: 0, y: 0};
     this._deltaX = this._deltaY = 0;
 
-    this._dragZone.addEventListener('mousedown', this._mouseDown.bind(this), false);
-    document.addEventListener('mousemove', this._moveMove.bind(this), false);
-    document.addEventListener('mouseup', this._mouseUp.bind(this), false);
+    this._limitCanvasWrap();
+
+    this._dragZone.addEventListener('mousedown', this._mouseDown.bind(this));
+    document.addEventListener('mousemove', this._moveMove.bind(this));
+    document.addEventListener('mouseup', this._mouseUp.bind(this));
   }
 
   fitCanvas(canvasEl) {
-    let headerHeight, footerHeight;
+    let offset;
 
     try {
-      headerHeight = this._container.querySelector(`#${withPrefix('preview-header')}`).clientHeight;
-      footerHeight = this._container.querySelector(`#${withPrefix('preview-footer')}`).clientHeight;
-    } catch (e) {
-      console.error(e);
-      throw new Error('WindowManager: Can\'t obtaint header & footer height');
+      offset = this._getHeaderFooterOffset();
+    } catch (_) {
+      offset = 0;
     }
 
     const containerWidth = this._container.clientWidth;
-    const containerHeight = this._container.clientHeight - (headerHeight + footerHeight);
+    const containerHeight = this._container.clientHeight - offset;
     const containerRatio = getRatio(containerWidth,containerHeight);
     const canvasRatio = getRatio(canvasEl.width, canvasEl.height);
 
@@ -54,6 +52,16 @@ export default class WindowManager {
       canvasEl.classList.remove('w100');
     } else {
       canvasEl.classList.add('w100', 'h100');
+    }
+  }
+
+  minimize(status) {
+    if (status) {
+      const header = this._container.querySelector(`#${withPrefix('preview-header')}`);
+      const headerHeight = header && header.clientHeight;
+      this._container.style.height = headerHeight ? headerHeight + 'px' : this._container.clientHeight + 'px';
+    } else {
+      this._container.style.removeProperty('height');
     }
   }
 
@@ -89,6 +97,38 @@ export default class WindowManager {
       this._dragZone.style.cursor = 'grab';
       this._translateOffset.x += this._deltaX;
       this._translateOffset.y += this._deltaY;
+    }
+  }
+
+  _limitCanvasWrap() {
+    const wrapEl = this._container.querySelector(`#${withPrefix('canvas-wrap')}`);
+    let error, offset;
+
+    try {
+      offset = this._getHeaderFooterOffset();
+    } catch (e) {
+      error = e;
+      offset = 0;
+    }
+
+    if (!wrapEl) error = 'WindowManager: Canvas wrap element not found';
+
+    if (error) {
+      console.error(error);
+      throw new Error(error);
+    }
+
+    wrapEl.style.maxWidth = this._container.clientWidth + 'px';
+    wrapEl.style.maxHeight = this._container.clientHeight - offset + 'px';
+  }
+
+  _getHeaderFooterOffset() {
+    try {
+      const headerHeight = this._container.querySelector(`#${withPrefix('preview-header')}`).clientHeight;
+      const footerHeight = this._container.querySelector(`#${withPrefix('preview-footer')}`).clientHeight;
+      return headerHeight + footerHeight;
+    } catch (e) {
+      throw new Error('WindowManager: Can\'t obtaint header & footer height');
     }
   }
 

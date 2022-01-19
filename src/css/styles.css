@@ -1,21 +1,20 @@
 #crms-container {
 	position: absolute;
 	left: 0;
+	width: 640px;
+	height: 570px;
 	z-index: 10;
 	background: #fff;
 	border-radius: 5px;
 	overflow: hidden;
 	box-shadow: 1px 1px 7px 0 #343434;
-	width: 500px;
-	height: 400px;
+	will-change: transform;
 }
 
 #crms-canvas-wrap {
 	display: flex;
 	justify-content: center;
 	background: #d3d3d3;
-	max-width: 500px;
-	max-height: 320px;
 }
 
 #crms-preview {
