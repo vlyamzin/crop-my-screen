@@ -1,6 +1,28 @@
 import {withPrefix} from './util';
 
-export default class AriaSelector {
+/**
+ * AreaSelector provides the ability for users to select the cropping area.
+ * It creates visual elements and controls to select a rectangle.
+ * Area selection is represented by two approaches:
+ * 1) by drawing the square
+ * 2) by resizing the existing area
+ *
+ * AreaSelector uses two canvases - one for backdrop and another as a mask for the selected area.
+ * Additionally, AreaSelector creates several UI elements (drag points) for moving area around the window.
+ * @property {boolean} resizing - Defines area resizing state
+ * @property {boolean} drawing - Defines area drawing state
+ * @property {HTMLDivElement} dragPoint - The element that user selects to resize the area
+ * @property {HTMLCanvasElement} backdropCanvas - Backdrop canvas element
+ * @property {CanvasRenderingContext2D} backdropCtx - Backdrop canvas context
+ * @property {number} START_X - Area rectangle top-left point (X-asis)
+ * @property {number} START_Y - Area rectangle top-left point (Y-asis)
+ * @property {number} END_X - Area rectangle bottom-right point (X-asis)
+ * @property {number} END_Y - Area rectangle bottom-right point (Y-asis)
+ * @property {number} CROP_W - Area rectangle width
+ * @property {number} CROP_H - Area rectangle height
+ * @property {string} BACKDROP_COLOR - Backdrop canvas color in HEX format with alpha channel (ex. #00000093)
+ */
+export default class AreaSelector {
   resizing = false;
   drawing = false;
   dragPoint;
@@ -14,7 +36,17 @@ export default class AriaSelector {
   CROP_H;
   BACKDROP_COLOR;
 
-  init(displaySurface, constraints) {
+  /**
+   * Initialize and render UI elements - backdrop, selected area and drag points
+   * Attach mouse events for area drawing
+   * @param {{
+   *   x: number,
+   *   y: number,
+   *   dx: number,
+   *   dy: number
+   * }} constraints - Predefined area constraints
+   */
+  init(constraints) {
     if (!constraints) {
       this.START_X = 0;
       this.START_Y = 0;
@@ -98,15 +130,15 @@ export default class AriaSelector {
       this._drawArea();
     };
 
-    this.areaSelectionStart = this.areaSelectionStart.bind(this);
-    this.areaSelectionEnd = this.areaSelectionEnd.bind(this);
-    this.areaSelectionMouseMove = this.areaSelectionMouseMove.bind(this);
-
     document.addEventListener('mousedown', this.areaSelectionStart);
     document.addEventListener('mouseup', this.areaSelectionEnd);
     document.addEventListener('mousemove', this.areaSelectionMouseMove);
   }
 
+  /**
+   * Get selected area coordinates.
+   * @returns {{dx: number, dy: number, x: number, y: number}}
+   */
   getCoords() {
     return {
       x: this.START_X,
@@ -116,6 +148,9 @@ export default class AriaSelector {
     };
   }
 
+  /**
+   * Remove UI elements and clear event listeners
+   */
   remove() {
     if (this.areaSelectionStart) {
       document.removeEventListener('mousedown', this.areaSelectionStart, false);
@@ -135,6 +170,11 @@ export default class AriaSelector {
     document.getElementById('backdrop-wrapper').remove();
   }
 
+  /**
+   * Init and render or clear backdrop canvas and related UI elements
+   * @param {boolean} status - Render or clear the backdrop
+   * @private
+   */
   _drawBackDrop(status) {
     if (!status) {
       const backdrop = document.getElementById('backdrop-wrapper');
@@ -162,8 +202,10 @@ export default class AriaSelector {
     this._drawResizeMarkers(this.backdropCtx);
   }
 
-
-  
+  /**
+   * Init and render selected area
+   * @private
+   */
   _drawArea() {
     this.backdropCtx.clearRect(0, 0, this.backdropCanvas.width, this.backdropCanvas.height);
     this.backdropCtx.fillStyle = this.BACKDROP_COLOR;
@@ -184,7 +226,10 @@ export default class AriaSelector {
     this.backdropCtx.strokeRect(this.START_X, this.START_Y, this.CROP_W, this.CROP_H);
   }
 
-  // swap coordinates in case drawing/resizing moved in opposite direction
+  /**
+   * Swap coordinates in case drawing/resizing moved in the opposite direction
+   * @private
+   */
   _swapCoordinates() {
     if (this.END_X < this.START_X) {
       const c = this.START_X;
@@ -200,6 +245,11 @@ export default class AriaSelector {
     }
   }
 
+  /**
+   * Init and render resize markers around the selected area. Attack mouse events to these points
+   * @param {CanvasRenderingContext2D} ctx - Backdrop canvas context
+   * @private
+   */
   _drawResizeMarkers(ctx) {
     const size = 8;
     const offset = size / 2;
@@ -256,12 +306,15 @@ export default class AriaSelector {
     });
   }
 
-  // screen-sharing area resize start
+  /**
+   * Start resizing the area. Define drag point
+   * @param {MouseEvent} e
+   * @private
+   */
   _areaResizeStart(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    // RemotePlatformHelper.hideElementById('sharingScreen');
     this.resizing = true;
     this.dragPoint = e.target;
     document.querySelectorAll('.draggable').forEach(el => {
@@ -270,7 +323,11 @@ export default class AriaSelector {
     });
   }
 
-  // screen-sharing area resize
+  /**
+   * Resize the area based on the drag point type
+   * @param {MouseWheelEvent} e
+   * @private
+   */
   _areaResize(e) {
     const pointSide = this.dragPoint.getAttribute('side');
 

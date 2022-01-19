@@ -1,5 +1,6 @@
 const path = require('path');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = () => {
   return {
@@ -13,6 +14,13 @@ module.exports = () => {
       clean: true
     },
     devtool: 'source-map',
+    optimization: {
+      minimizer: [
+        new UglifyJsPlugin({
+          extractComments: true,
+        }),
+      ],
+    },
     module: {
       rules: [
         {

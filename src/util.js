@@ -1,4 +1,7 @@
-
+/**
+ * Get browser name from user agent
+ * @returns {string}
+ */
 function getUserAgent() {
   let ua;
   const sUsrAg = navigator.userAgent;
@@ -25,7 +28,10 @@ function getUserAgent() {
   return ua;
 }
 
-// returns the distance between the browser top-left corner and the top-left corner of the main monitor
+/**
+ * Get distance between the browser top-left corner and the top-left corner of the main monitor
+ * @returns {{top: number, left: number}}
+ */
 function getScreenOffset() {
   return {
     // includes the browser's tab bar
@@ -34,17 +40,44 @@ function getScreenOffset() {
   };
 }
 
+/**
+ * Get the browser top bar size
+ * IMPORTANT - THIS METHOD IS NOT IDEAL AS IT ALSO COUNTS THE BROWSER BOTTOM BAR IF IT EXISTS
+ * @returns {number}
+ */
 function getBrowserHeaderSize() {
   return window.outerHeight - window.innerHeight;
 }
 
+/**
+ * Get aspect ration
+ * @param {number} width
+ * @param {number} height
+ * @returns {number}
+ */
 function getRatio(width, height) {
   return (width > height) ? (width / height) : (height / width);
 }
 
+/**
+ * Add plugin prefix to the string id
+ * @param {string} id
+ * @returns {string}
+ */
 function withPrefix(id) {
   return `${window.CropMyScreen.prefix}-${id}`;
 }
 
+/**
+ * Call callback function with provided parameters
+ * @param {Function} callback
+ * @param {any} params
+ */
+function doCallback (callback, params) {
+  if (callback && typeof callback === 'function') {
+    callback.call(this, params);
+  }
+}
 
-export {getUserAgent, getBrowserHeaderSize, getScreenOffset, getRatio, withPrefix};
+
+export {getUserAgent, getBrowserHeaderSize, getScreenOffset, getRatio, withPrefix, doCallback};

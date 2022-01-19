@@ -1,20 +1,38 @@
-import AriaSelector from './aria-selector';
+import AreaSelector from './area-selector';
 import WindowManager from './window-manager';
-import {getUserAgent, getScreenOffset, getBrowserHeaderSize, withPrefix} from './util';
+import {getUserAgent, getScreenOffset, getBrowserHeaderSize, withPrefix, doCallback} from './util';
 import xmarkSVG from './assets/xmark.svg';
 import minimizeSVG from './assets/window-minimize.svg';
 import restoreSVG from './assets/window-maximize.svg';
 
-
-const doCallback = (callback, params) => {
-  if (callback && typeof callback === 'function') {
-    callback.call(this, params);
-  }
-};
-
+/**
+ * This class renders UI elements and does the main job in the cropping process.
+ * Cropper creates the <video> element in which the MediaStream has been placed.
+ * When the video starts playing the Cropper gets data per frame and put it into the canvas in the preview window.
+ * The Cropper crops the canvas by specified constraints and extracts media stream from it via
+ * 'canvas.captureStream()' method.
+ *
+ * @property {{x: number, y: number, dx: number, dy: number}} constraints - Area to crop
+ * @property {AreaSelector} areaSelector - Instance of AreaSelector class
+ * @property {WindowManager} windowManager - Instance of WindowManager class
+ * @property {HTMLDivElement} containerEl - Instance of main DOM element
+ * @property {HTMLVideoElement} videoEl - Instance of video
+ * @property {HTMLCanvasElement} canvas - Instance of canvas
+ * @property {string} displaySurfaceType - Property of the  MediaTrackSettings dictionary. Defines what surface type
+ *                                         of the Screenshare API has been selected. Possible values:
+ *                                         - 'monitor',
+ *                                         - 'browser',
+ *                                         - 'tab',
+ *                                         - 'undefined' - as Firefox does not support this property yet
+ * @property {
+ *    {1: Array<HTMLButtonElement>, 2: Array<HTMLButtonElement>}
+ *  } buttonGroup - Splits footer buttons into two groups. Hides one of the groups on demand
+ *
+ *
+ */
 export default class Cropper {
   constraints;
-  ariaSelector;
+  areaSelector;
   windowManager;
   containerEl;
   videoEl;
@@ -25,16 +43,21 @@ export default class Cropper {
     2: []
   };
 
-  _containerId = 'container';
-
   constructor() {
-    this.ariaSelector = new AriaSelector();
+    this.areaSelector = new AreaSelector();
   }
 
+  /**
+   * Initialize and render UI elements.
+   * Initialize additional modules like WindowManager and AreaSelector
+   * @param {string} customClass - CSS class attached to the main container
+   * @param {string} backdropColor - HEX color for the canvas backdrop of the AreaSelector
+   */
   render({customClass, backdropColor}) {
-    if (document.getElementById(withPrefix(this._containerId))) return;
+    const containerId = 'container';
+    if (document.getElementById(withPrefix(containerId))) return;
 
-    this.containerEl = this._createElement('div', withPrefix(this._containerId));
+    this.containerEl = this._createElement('div', withPrefix(containerId));
     customClass && this.containerEl.classList.add(customClass);
     this.videoEl = this._createElement('video', withPrefix('input'));
     this.canvas = this._createElement('canvas', withPrefix('output'));
@@ -49,9 +72,20 @@ export default class Cropper {
 
     document.body.appendChild(this.containerEl);
     this.windowManager = new WindowManager(this.containerEl);
-    this.ariaSelector.BACKDROP_COLOR = backdropColor;
+    this.areaSelector.BACKDROP_COLOR = backdropColor;
   }
 
+  /**
+   * Put stream into video element. Define canvas width/height based on provided constraints.
+   * Start cropping process
+   * @param {MediaStream} stream - Video stream object from Screenshare API
+   * @param {{
+   *   x: number,
+   *   y: number,
+   *   dx: number,
+   *   dy: number
+   * }} constraints - Constraints for the canvas
+   */
   startStream(stream, constraints) {
     const {dx, dy} = constraints;
     const context = this.canvas.getContext('2d');
@@ -77,6 +111,9 @@ export default class Cropper {
     this.windowManager.fitCanvas(this.canvas);
   }
 
+  /**
+   * Stop cropping process. Clear video element and hide preview window
+   */
   stopStream() {
     const tracks = this.videoEl.srcObject.getTracks();
     (tracks || []).forEach(t => t.stop());
@@ -84,8 +121,11 @@ export default class Cropper {
     this._togglePreviewer(false);
   }
 
+  /**
+   * Delete all plugin modules. Clear the UI
+   */
   destroy() {
-    this.ariaSelector.destroy();
+    this.areaSelector.destroy();
     this.windowManager.destroy();
     this.containerEl.remove();
   }
@@ -98,9 +138,18 @@ export default class Cropper {
   onStreamStarted(stream) {
   }
 
+  /**
+   * Event. Notifies when crop is stopped
+   */
   onStreamStopped() {
   }
 
+  /**
+   * Modify the canvas element
+   * @param {CanvasRenderingContext2D} context - Canvas context object
+   * @param {HTMLVideoElement} video - Video element with original stream
+   * @private
+   */
   _cropFrame(context, video) {
     if (!context) return;
 
@@ -119,12 +168,25 @@ export default class Cropper {
     );
   }
 
+  /**
+   * Create DOM element with provided id
+   * @param {string} type - DOM element type
+   * @param {string} id - ID name
+   * @returns {HTMLElement}
+   * @private
+   */
   _createElement(type, id) {
     const el = document.createElement(type);
     el.setAttribute('id', id);
     return el;
   }
 
+  /**
+   * Render preview window. Defines popup header and footer with buttons
+   * @param {HTMLCanvasElement} canvas - Canvas object
+   * @returns {HTMLElement} - popup window element
+   * @private
+   */
   _initPreviewer(canvas) {
     const popup = this._createElement('div', withPrefix('preview'));
     const canvasWrap = this._createElement('div', withPrefix('canvas-wrap'));
@@ -139,7 +201,7 @@ export default class Cropper {
     });
 
     this._footerButtonsConfig.forEach(btnSettings => {
-      let btn = this._initPreviewButton(btnSettings);
+      let btn = this._renderFooterButton(btnSettings);
       popupFooter.append(btn);
     });
 
@@ -148,9 +210,18 @@ export default class Cropper {
     popup.append(popupHeader, canvasWrap, popupFooter);
 
     return popup;
-
   }
 
+  /**
+   * Initialize and render the button in the preview header.
+   * Add event handlers for the button.
+   * @param {string} id - Button id name
+   * @param {string} icon - Icon in SVG format
+   * @param {Function} callback - Event handler
+   * @param {string} iconSize - CSS class that defines the size of the icon (possible values s20 and s24)
+   * @returns {HTMLButtonElement} - Button element
+   * @private
+   */
   _renderHeaderButton({id, icon, callback, iconSize}) {
     const btn = document.createElement('button');
     btn.setAttribute('id', id);
@@ -168,7 +239,18 @@ export default class Cropper {
     return btn;
   }
 
-  _initPreviewButton({id, text, primary, visible, group, callback}) {
+  /**
+   * Initialize and render the button in the preview footer.
+   * @param {string} id - Button id name
+   * @param {string} text - Button text value
+   * @param {boolean} primary - Button type - primary or default
+   * @param {boolean} visible - Button visibility
+   * @param {Array<HTMLButtonElement>} group - Array with buttons
+   * @param {Function} callback - Event handler
+   * @returns {HTMLButtonElement} - Button element
+   * @private
+   */
+  _renderFooterButton({id, text, primary, visible, group, callback}) {
     const btn = document.createElement('button');
     btn.setAttribute('id', id);
     btn.setAttribute('type', 'button');
@@ -187,12 +269,22 @@ export default class Cropper {
     return btn;
   }
 
+  /**
+   * Show or hide preview window
+   * @param {boolean} status - If true - show the window
+   * @private
+   */
   _togglePreviewer(status) {
     status
       ? this.containerEl.classList.remove(withPrefix('hidden'))
       : this.containerEl.classList.add(withPrefix('hidden'));
   }
 
+  /**
+   * Show or hide specific button group
+   * @param {number} status - Button group id
+   * @private
+   */
   _toggleButtons(status) {
     if (status === 1) {
       this.buttonGroup['1'].forEach(btn => btn.classList.remove(withPrefix('hidden')));
@@ -206,11 +298,28 @@ export default class Cropper {
     }
   }
 
-
-  // correct coordinates based on screen-sharing type (the whole screen or browser/tab only)
-  // 'monitor' is the whole screen
-  // there might be a chance when displaySurface prop is not defined. It happens only in Firefox (version < 93)
-  // as it does not support MediaTrackSettings.displaySurface
+  /**
+   * Correct coordinates based on screen-sharing type (the whole screen or browser/tab only)
+   * 'monitor' is the whole screen
+   * there might be a chance when displaySurface prop is not defined. It happens only in Firefox (tested on version < 93)
+   * as it does not support MediaTrackSettings.displaySurface.
+   * Coordinate correction is applied based on 'applyOffset' value. For outbound stream the offset is being added.
+   * For AreaSelector class the offset is being subtract.
+   * @param {{
+   *  x: number,
+   *  y: number,
+   *  dx: number,
+   *  dy: number
+   * }} coordinates - User defined constraints for the canvas
+   * @param {boolean} applyOffset - Add or remove offset from coordinates
+   * @returns {{
+   *   x: number,
+   *   y: number,
+   *   dx: number,
+   *   dy: number
+   * }}
+   * @private
+   */
   _correctCoordinates(coordinates, applyOffset) {
     const browser = getUserAgent();
 
@@ -224,7 +333,8 @@ export default class Cropper {
       };
     }
 
-    if (this.displaySurfaceType === 'window') {
+    if (this.displaySurfaceType === 'window' || this.displaySurfaceType === 'browser') {
+      console.warn('CropMyScreen does support cropping of the entire screen.\nIt does not crop browser window or tab well enough.\nPlease, use \'Entire screen\' option instead.');
       let buggedOffset = 0;
 
       // in Chrome if user selects 'window' or 'tab' for sharing there is a strange bug with extra 7px offset from top
@@ -243,6 +353,18 @@ export default class Cropper {
     return coordinates;
   }
 
+  /**
+   * Configuration for header buttons
+   * @returns {
+   *  Array<{
+   *    id: string,
+   *    icon: string,
+   *    iconSize: string,
+   *    callback: Function,
+   *  }>
+   * }
+   * @private
+   */
   get _headerButtonsConfig() {
     const minimize = {
       id: withPrefix('btn-minimize'),
@@ -274,6 +396,20 @@ export default class Cropper {
     return [minimize, close];
   }
 
+  /**
+   * Configuration for footer buttons
+   * @returns {
+   *   Array<{
+   *     visible: boolean,
+   *     callback: Function,
+   *     id: string,
+   *     text: string,
+   *     primary: boolean,
+   *     group: Array<string>
+   *   }>
+   * }
+   * @private
+   */
   get _footerButtonsConfig() {
     const selectArea = {
       id: withPrefix('btn-select-area'),
@@ -283,7 +419,7 @@ export default class Cropper {
       group: this.buttonGroup['1'],
       callback: () => {
         const constraints = this._correctCoordinates(this.constraints, false);
-        this.ariaSelector.init(this.displaySurfaceType, constraints);
+        this.areaSelector.init(constraints);
         this._toggleButtons(2);
       }
     };
@@ -294,7 +430,7 @@ export default class Cropper {
       visible: false,
       group: this.buttonGroup['2'],
       callback: () => {
-        this.ariaSelector.remove();
+        this.areaSelector.remove();
         this._toggleButtons(1);
       },
     };
@@ -305,8 +441,8 @@ export default class Cropper {
       visible: false,
       group: this.buttonGroup['2'],
       callback: () => {
-        this.constraints = this._correctCoordinates(this.ariaSelector.getCoords(), true);
-        this.ariaSelector.remove();
+        this.constraints = this._correctCoordinates(this.areaSelector.getCoords(), true);
+        this.areaSelector.remove();
         this.canvas.width = this.constraints.dx;
         this.canvas.height = this.constraints.dy;
         this.windowManager.fitCanvas(this.canvas);
