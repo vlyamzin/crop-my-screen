@@ -11,6 +11,8 @@ import restoreSVG from './assets/window-maximize.svg';
  * When the video starts playing the Cropper gets data per frame and put it into the canvas in the preview window.
  * The Cropper crops the canvas by specified constraints and extracts media stream from it via
  * 'canvas.captureStream()' method.
+ * In the future it might be possible to put MediaStream directly into the Canvas by passing it through the MediaStreamTrackProcessor
+ * which is a part of WebCodec API. The example is here https://stackoverflow.com/a/56095482
  *
  * @property {{x: number, y: number, dx: number, dy: number}} constraints - Area to crop
  * @property {AreaSelector} areaSelector - Instance of AreaSelector class

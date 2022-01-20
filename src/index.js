@@ -69,6 +69,7 @@ class CropMyScreen {
    * Remove all plugin related DOM elements. Stop all event listeners
    */
   destroy() {
+    this.stop();
     this.cropper.destroy();
   }
 
