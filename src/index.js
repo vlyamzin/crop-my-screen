@@ -23,6 +23,12 @@ class CropMyScreen {
 
 
   constructor(options) {
+    try {
+      this._validateOptions(options);
+    } catch (e) {
+      throw new Error('CropMyScreen: Plugin initialization error. Some of the provided options are invalid');
+    }
+
     this.settings = { ...this._defaultOptions(), ...(options || {}) };
 
     this.cropper = new Cropper(CropMyScreen.prefix);
@@ -87,6 +93,36 @@ class CropMyScreen {
       cropH: 480,
       previewerClass: ''
     };
+  }
+
+  _validateOptions({backdropColor, cropX, cropY, cropW, cropH}) {
+    const colorRegExShort = new RegExp('^#[a-fA-F0-9]{3}$', 'gm');
+    const colorRegExFull = new RegExp('^#[a-fA-F0-9]{6}([0-9]{2})?$', 'gm');
+
+    if (backdropColor && !colorRegExShort.test(backdropColor) && !colorRegExFull.test(backdropColor)) {
+      console.error('CropMyScreen: Backdrop color format error. Color must be set in HEX format - e.g. "#fff", "#fffaaa", "#fffaaa12"');
+      throw new Error();
+    }
+
+    if (cropX && isNaN(+cropX)) {
+      console.error('CropMyScreen: cropX value is not a number');
+      throw new Error();
+    }
+
+    if (cropY && isNaN(+cropY)) {
+      console.error('CropMyScreen: cropY value is not a number');
+      throw new Error();
+    }
+
+    if (cropW && isNaN(+cropW)) {
+      console.error('CropMyScreen: cropW value is not a number');
+      throw new Error();
+    }
+
+    if (cropH && isNaN(+cropH)) {
+      console.error('CropMyScreen: cropH value is not a number');
+      throw new Error();
+    }
   }
 }
 
