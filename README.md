@@ -4,9 +4,9 @@ CropMyScreen is a zero dependency plugin written completely with vanilla javascr
 
 ## How it works 🚀
 
-You give the [MediaStream](https://developer.mozilla.org/en-US/docs/Web/API/MediaStream/MediaStream) object to the plugin. CropMyScreen puts that stream into the HTMLVideoElement and renders this video on canvas. The part of the canvas is extracted according to the constraints that you provided by options or after the manual selection. This part is your cropped stream that the plugin outputs to you.
+You give the [MediaStream](https://developer.mozilla.org/en-US/docs/Web/API/MediaStream/MediaStream) object to the plugin. CropMyScreen puts that stream into the HTMLVideoElement. The part of the video is extracted into the canvas according to the constraints that you provided by options or after the manual selection. In the end, the canvas outputs your new cropped stream.
 
-<!-- Add diagram here -->
+![Workflow diagram](https://github.com/vlyamzin/crop-my-screen/blob/main/diagram.png?raw=true)
 
 ## How to use 🔧
 Add `crop-my-screen.min.js` file to your HTML page. Create an instance of the plugin somewhere in your code.
