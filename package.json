@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Crop MediaStream in browser",
   "scripts": {
-    "build": "node -e \"require('fs-extra').emptyDir('dist');\" && webpack --mode production",
+    "build": "webpack --mode production",
     "start": "webpack --watch --mode development"
   },
   "keywords": [

@@ -2,18 +2,21 @@ const path = require('path');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-module.exports = () => {
+module.exports = (env, argv) => {
+  const isProduction = argv.mode === 'production';
+  const filename = isProduction ? 'crop-my-screen.min.js' : 'crop-my-screen.js';
+
   return {
     entry: './src/index.js',
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'crop-my-screen.js',
+      filename: filename,
       libraryTarget: 'var',
       libraryExport: 'default',
       library: 'CropMyScreen',
       clean: true
     },
-    devtool: 'source-map',
+    devtool: isProduction ? undefined : 'source-map',
     optimization: {
       minimizer: [
         new UglifyJsPlugin({

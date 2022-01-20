@@ -11,8 +11,6 @@
     cropH: constraints.height,
   });
 
-  cropper.init();
-
   startBtn.addEventListener('click', async () => {
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({

@@ -24,21 +24,12 @@ class CropMyScreen {
 
   constructor(options) {
     this.settings = { ...this._defaultOptions(), ...(options || {}) };
-  }
 
-  /**
-   * Prepare and render all elements of the plugin in DOM
-   */
-  init() {
-    if (!this.cropper) {
-      this.cropper = new Cropper(CropMyScreen.prefix);
-    }
-
+    this.cropper = new Cropper(CropMyScreen.prefix);
     this.cropper.render({
       customClass: this.settings.previewerClass,
       backdropColor: this.settings.backdropColor,
     });
-
   }
 
   /**
