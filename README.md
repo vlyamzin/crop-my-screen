@@ -144,7 +144,7 @@ Unfortunately, nothing is ideal in this world, and CropMyScreen is no exception.
 CropMyScreen works the best while capturing the whole screen/monitor. There is an option to capture only the browser window in Chromium-based and Firefox browsers. Even though this solution will work, the preferable way is still 'Entire screen'.
 
 #### Issue #2
-CropMyScreen can understand where the browser window is placed on the screen and excludes offsets automatically. The plugin subtracts the browser top bar with tabs and other pannels via the formula
+CropMyScreen can understand where the browser window is placed on the screen and excludes offsets automatically. The plugin subtracts the browser top bar with tabs and other panels via the formula
 ```javascript
 const browserHeaderSize = window.outerHeight - window.innerHeight;
 ```
