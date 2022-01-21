@@ -2,6 +2,8 @@
 
 CropMyScreen is a zero dependency plugin written completely with vanilla javascript. It helps you share only that part of the screen that you want to show and cut all other sensitive information off. And do it right from your browser.
 
+**[Try it out in the demo →](https://vlyamzin.github.io/crop-my-screen/)**
+
 ## How it works 🚀
 
 You give the [MediaStream](https://developer.mozilla.org/en-US/docs/Web/API/MediaStream/MediaStream) object to the plugin. CropMyScreen puts that stream into the HTMLVideoElement. The part of the video is extracted into the canvas according to the constraints that you provided by options or after the manual selection. In the end, the canvas outputs your new cropped stream.

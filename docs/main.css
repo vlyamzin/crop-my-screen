@@ -1,0 +1,129 @@
+html, body, * {
+	font-family: 'Roboto', sans-serif;
+	color: #4D4D4D;
+}
+
+:root {
+	--circle-radius: 80px;
+	--border-size: 2px;
+	--border: var(--border-size) solid #6CE2BF;
+}
+
+a {
+	color: #48b59e;
+}
+
+a:hover {
+	color: #2b6b58;
+}
+
+
+#container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#tutorial {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: stretch;
+	margin: 10px 0 30px;
+	border-bottom: 1px solid #eee;
+}
+
+.step {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	padding: 10px 0;
+}
+
+.sequence-item {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	width: 100%;
+}
+
+.line {
+	flex-grow: 1;
+	height: calc((var(--circle-radius) + var(--border-size) * 2) / 2);
+	border-bottom: var(--border);
+}
+
+.line.left {
+	margin-right: 7px;
+}
+
+.line.right {
+	margin-left: 7px;
+}
+
+.sequence-item.first .line.left {
+	border-bottom: none;
+}
+
+.sequence-item.last .line.right {
+	border-bottom: none;
+}
+
+.number-indicator {
+	width: var(--circle-radius);
+	height: var(--circle-radius);
+	border-radius: 50%;
+	border: var(--border);
+	background-color: #67FCCF;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.number-indicator > span {
+	font-size: 36px;
+	text-shadow: 3px 4px 4px #00000030;
+}
+
+.description {
+	margin: 16px 20px;
+	text-align: center;
+}
+
+label[for="input-id"] {
+	width: auto !important;
+}
+
+#start-connection {
+	margin-left: 10px;
+}
+
+#connection-status > span {
+	font-weight: bold;
+}
+
+#start-screenshare {
+	margin-bottom: 40px;
+}
+
+
+.btn-grad {background-image: linear-gradient(to right, #00C9FF 0%, #92FE9D  51%, #00C9FF  100%)}
+.btn-grad {
+	margin: 10px;
+	padding: 15px 45px;
+	text-align: center;
+	text-transform: uppercase;
+	transition: 0.5s;
+	background-size: 200% auto;
+	box-shadow: 0 0 20px #eee;
+	border-radius: 10px;
+	display: block;
+	cursor: pointer;
+}
+
+.btn-grad:hover {
+	background-position: right center; /* change the direction of the change here */
+	text-decoration: none;
+}
+
