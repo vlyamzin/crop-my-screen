@@ -149,9 +149,21 @@ export default class AreaSelector {
   }
 
   /**
-   * Remove UI elements and clear event listeners
+   * Clean up AreaSelector
    */
-  remove() {
+  destroy() {
+    try {
+      this._remove();
+    } catch (_) {
+      // I want application to not crush, but don't care about the message
+    }
+  }
+
+  /**
+   * Remove UI elements and clear event listeners
+   * @private
+   */
+  _remove() {
     if (this.areaSelectionStart) {
       document.removeEventListener('mousedown', this.areaSelectionStart, false);
       this.areaSelectionStart = null;

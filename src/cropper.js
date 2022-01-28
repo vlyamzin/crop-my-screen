@@ -391,6 +391,8 @@ export default class Cropper {
       icon: xmarkSVG,
       iconSize: 's24',
       callback: () => {
+        this.areaSelector.destroy();
+        this._toggleButtons(1);
         this.stopStream();
         this.onStreamStopped();
       }
@@ -432,7 +434,7 @@ export default class Cropper {
       visible: false,
       group: this.buttonGroup['2'],
       callback: () => {
-        this.areaSelector.remove();
+        this.areaSelector.destroy();
         this._toggleButtons(1);
       },
     };
@@ -444,7 +446,7 @@ export default class Cropper {
       group: this.buttonGroup['2'],
       callback: () => {
         this.constraints = this._correctCoordinates(this.areaSelector.getCoords(), true);
-        this.areaSelector.remove();
+        this.areaSelector.destroy();
         this.canvas.width = this.constraints.dx;
         this.canvas.height = this.constraints.dy;
         this.windowManager.fitCanvas(this.canvas);
