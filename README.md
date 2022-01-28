@@ -14,7 +14,7 @@ You give the [MediaStream](https://developer.mozilla.org/en-US/docs/Web/API/Medi
 Add `crop-my-screen.min.js` file to your HTML page. Create an instance of the plugin somewhere in your code.
 
 ```javascript
-const cropper = new CropMyScren(options)
+const cropper = new CropMyScreen(options)
 ```
 Get MediaStream object
 
@@ -83,7 +83,7 @@ const options = {
 }
 ```
 
-#### **cropY**
+#### **cropH**
 The height of the cropping rectangle.
 * Type: `Number`
 * Default value: 480
