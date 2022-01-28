@@ -1,4 +1,4 @@
-import {getRatio, withPrefix} from './util';
+import {aspectRationEnum, getRatio, withPrefix} from './util';
 
 /**
  * WindowManager is responsible for positioning the preview window.
@@ -51,13 +51,20 @@ export default class WindowManager {
 
   /**
    * Prevent the canvas from moving outside the parent container.
-   * If the aspect ratio of the preview window is bigger than the canvas aspect ratio -
-   * the canvas must be aligned vertically (grey zones appear on the left and right sides).
-   * Otherwise the canvas must be aligned horizontally (grey zones appear on the top and bottom sides)
+   * For landscape mode the canvas must be aligned horizontally - (grey zones appear on the left and right sides)
+   * For portrait mode the canvas must be aligned vertically - (grey zones appear on the top and bottom sides)
    * @param {HTMLCanvasElement} canvasEl - Cropping canvas
    */
   fitCanvas(canvasEl) {
     let offset;
+    const applyStyles = (condition) => {
+      if (condition) {
+        canvasEl.classList.add('w100', 'h100');
+      } else {
+        canvasEl.classList.add('h100');
+        canvasEl.classList.remove('w100');
+      }
+    };
 
     try {
       offset = this._getHeaderFooterOffset();
@@ -68,14 +75,13 @@ export default class WindowManager {
     const containerWidth = this._container.clientWidth;
     const containerHeight = this._container.clientHeight - offset;
     const containerRatio = getRatio(containerWidth,containerHeight);
-    const canvasRatio = getRatio(canvasEl.width, canvasEl.height);
 
+    if (containerRatio === aspectRationEnum.portrait) {
+      applyStyles(canvasEl.width > containerWidth);
+    }
 
-    if (containerRatio > canvasRatio) {
-      canvasEl.classList.add('h100');
-      canvasEl.classList.remove('w100');
-    } else {
-      canvasEl.classList.add('w100', 'h100');
+    if (containerRatio === aspectRationEnum.landscape) {
+      applyStyles(canvasEl.width > containerWidth && canvasEl.height < containerHeight);
     }
   }
 

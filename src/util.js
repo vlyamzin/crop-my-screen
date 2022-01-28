@@ -56,7 +56,7 @@ function getBrowserHeaderSize() {
  * @returns {number}
  */
 function getRatio(width, height) {
-  return (width > height) ? (width / height) : (height / width);
+  return width/height > 1 ? aspectRationEnum.landscape : aspectRationEnum.portrait;
 }
 
 /**
@@ -79,5 +79,14 @@ function doCallback (callback, params) {
   }
 }
 
+/**
+ * Human readable values for aspect ratio
+ * @type {{portrait: number, landscape: number}}
+ */
+const aspectRationEnum = {
+  landscape: 1,
+  portrait: 2
+};
 
-export {getUserAgent, getBrowserHeaderSize, getScreenOffset, getRatio, withPrefix, doCallback};
+
+export {getUserAgent, getBrowserHeaderSize, getScreenOffset, getRatio, withPrefix, doCallback, aspectRationEnum};
