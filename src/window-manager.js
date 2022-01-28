@@ -118,6 +118,8 @@ export default class WindowManager {
    * @private
    */
   _mouseDown(event) {
+    event.stopPropagation();
+
     this._isMoving = true;
     this._dragZone.style.cursor = 'grabbing';
     this._startCoords.x = event.clientX;
@@ -132,6 +134,8 @@ export default class WindowManager {
    * @private
    */
   _moveMove(event) {
+    event.stopPropagation();
+
     if (!this._isMoving) {
       return;
     }
@@ -146,7 +150,9 @@ export default class WindowManager {
    * End moving the window
    * @private
    */
-  _mouseUp() {
+  _mouseUp(event) {
+    event.stopPropagation();
+
     if (this._isMoving) {
       this._isMoving = false;
       this._dragZone.style.cursor = 'grab';
