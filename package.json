@@ -1,6 +1,6 @@
 {
   "name": "crop-my-screen",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Crop MediaStream in browser",
   "scripts": {
     "build": "webpack --mode production",
