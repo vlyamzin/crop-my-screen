@@ -83,7 +83,7 @@ const options = {
 }
 ```
 
-#### **cropY**
+#### **cropH**
 The height of the cropping rectangle.
 * Type: `Number`
 * Default value: 480
