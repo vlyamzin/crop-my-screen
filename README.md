@@ -11,7 +11,24 @@ You give the [MediaStream](https://developer.mozilla.org/en-US/docs/Web/API/Medi
 ![Workflow diagram](https://github.com/vlyamzin/crop-my-screen/blob/main/diagram.png?raw=true)
 
 ## How to use 🔧
-Add `crop-my-screen.min.js` file to your HTML page. Create an instance of the plugin somewhere in your code.
+Install from npm
+
+```bash
+npm install crop-my-screen
+```
+
+import in your code
+
+```javascript
+import CropMyScreen from 'crop-my-screen';
+```
+
+Also, you can simply add a minified file to your HTML page. 
+```html
+<script src="https://unpkg.com/crop-my-screen@1.0.2/dist/crop-my-screen.min.js"></script>
+```
+
+Create an instance of the plugin somewhere in your code.
 
 ```javascript
 const cropper = new CropMyScreen(options)
