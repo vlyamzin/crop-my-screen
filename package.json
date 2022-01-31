@@ -1,6 +1,6 @@
 {
   "name": "crop-my-screen",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Crop MediaStream in a browser",
   "main": "dist/crop-my-screen.js",
   "browser": "dist/crop-my-screen.js",

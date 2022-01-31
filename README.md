@@ -25,7 +25,7 @@ import CropMyScreen from 'crop-my-screen';
 
 Also, you can simply add a minified file to your HTML page. 
 ```html
-<script src="https://unpkg.com/crop-my-screen@1.0.2/dist/crop-my-screen.min.js"></script>
+<script src="https://unpkg.com/crop-my-screen@1.0.3/dist/crop-my-screen.min.js"></script>
 ```
 
 Create an instance of the plugin somewhere in your code.
