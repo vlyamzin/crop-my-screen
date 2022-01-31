@@ -117,19 +117,27 @@ export default class Cropper {
    * Stop cropping process. Clear video element and hide preview window
    */
   stopStream() {
-    const tracks = this.videoEl.srcObject.getTracks();
-    (tracks || []).forEach(t => t.stop());
-    this.videoEl.srcObject = null;
-    this._togglePreviewer(false);
+    try {
+      const tracks = this.videoEl.srcObject.getTracks();
+      (tracks || []).forEach(t => t.stop());
+      this.videoEl.srcObject = null;
+      this._togglePreviewer(false);
+    } catch (e) {
+      // I want application to not crush, but don't care about the message
+    }
   }
 
   /**
    * Delete all plugin modules. Clear the UI
    */
   destroy() {
-    this.areaSelector.destroy();
-    this.windowManager.destroy();
-    this.containerEl.remove();
+    try {
+      this.areaSelector.destroy();
+      this.windowManager.destroy();
+      this.containerEl.remove();
+    } catch (e) {
+      // I want application to not crush, but don't care about the message
+    }
   }
 
   /**

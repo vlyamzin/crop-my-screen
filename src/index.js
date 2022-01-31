@@ -17,19 +17,17 @@ import './css/styles.css';
  * @property cropper - Instance of Cropper class
  */
 class CropMyScreen {
-  static prefix = 'crms';
   settings;
   cropper;
 
 
   constructor(options) {
     try {
-      this._validateOptions(options);
+      this.settings = { ...this._defaultOptions(), ...(options || {}) };
+      this._validateOptions(this.settings);
     } catch (e) {
       throw new Error('CropMyScreen: Plugin initialization error. Some of the provided options are invalid');
     }
-
-    this.settings = { ...this._defaultOptions(), ...(options || {}) };
 
     this.cropper = new Cropper(CropMyScreen.prefix);
     this.cropper.render({
@@ -46,6 +44,10 @@ class CropMyScreen {
    * @returns {Promise<MediaStream>}
    */
   start(stream) {
+    if (!this.cropper) {
+      throw Error('CropMyScreen: Instance error. It seems like the plugin does not initialize properly or has already been destroyed.');
+    }
+
     this.cropper.startStream(stream, {
       x: this.settings.cropX,
       y: this.settings.cropY,
@@ -75,8 +77,11 @@ class CropMyScreen {
    * Remove all plugin related DOM elements. Stop all event listeners
    */
   destroy() {
-    this.stop();
-    this.cropper.destroy();
+    if (this.cropper) {
+      this.stop();
+      this.cropper.destroy();
+      this.cropper = null;
+    }
   }
 
   /**

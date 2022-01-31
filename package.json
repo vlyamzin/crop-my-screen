@@ -1,16 +1,31 @@
 {
   "name": "crop-my-screen",
-  "version": "1.0.1",
-  "description": "Crop MediaStream in browser",
+  "version": "1.0.2",
+  "description": "Crop MediaStream in a browser",
+  "main": "dist/crop-my-screen.js",
+  "browser": "dist/crop-my-screen.js",
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/vlyamzin/crop-my-screen",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vlyamzin/crop-my-screen.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vlyamzin/crop-my-screen/issues"
+  },
   "scripts": {
     "build": "webpack --mode production",
     "start": "webpack --watch --mode development"
   },
   "keywords": [
     "crop",
+    "mediastream",
     "screensharing",
     "js",
-    "vanilla"
+    "vanilla",
+    "no-dependencies"
   ],
   "author": "Vlad Lyamzin",
   "license": "ISC",
@@ -25,7 +40,7 @@
     "fs-extra": "^10.0.0",
     "style-loader": "^3.3.1",
     "svg-inline-loader": "^0.8.2",
-    "uglifyjs-webpack-plugin": "^2.2.0",
+    "terser-webpack-plugin": "^5.3.0",
     "webpack": "^5.64.4",
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.7.3"

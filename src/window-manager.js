@@ -103,12 +103,16 @@ export default class WindowManager {
    * Remove UI elements and event listeners
    */
   destroy() {
-    this._dragZone.removeEventListener('mousedown', this._mouseDown);
-    document.removeEventListener('mousemove', this._moveMove);
-    document.removeEventListener('mouseup', this._mouseUp);
-    this._dragZone.remove();
-    this._container = null;
-    this._dragZone = null;
+    try {
+      this._dragZone.removeEventListener('mousedown', this._mouseDown);
+      document.removeEventListener('mousemove', this._moveMove);
+      document.removeEventListener('mouseup', this._mouseUp);
+      this._dragZone.remove();
+      this._container = null;
+      this._dragZone = null;
+    } catch (e) {
+      // I want application to not crush, but don't care about the message
+    }
   }
 
   /**

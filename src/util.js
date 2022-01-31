@@ -1,4 +1,10 @@
 /**
+ * Prefix for the plugin related CSS selectors
+ * @type {string}
+ */
+const prefix = 'crms';
+
+/**
  * Get browser name from user agent
  * @returns {string}
  */
@@ -65,7 +71,7 @@ function getRatio(width, height) {
  * @returns {string}
  */
 function withPrefix(id) {
-  return `${window.CropMyScreen.prefix}-${id}`;
+  return `${prefix}-${id}`;
 }
 
 /**

@@ -1,30 +1,10 @@
 const path = require('path');
-const version = require('./package.json').version;
 const ESLintPlugin = require('eslint-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
-module.exports = (env, argv) => {
-  const isProduction = argv.mode === 'production';
-  const filename = isProduction ? `crop-my-screen.${version}.min.js` : `crop-my-screen.${version}.js`;
-
-  return {
-    entry: './src/index.js',
-    output: {
-      path: path.resolve(__dirname, 'dist'),
-      filename: filename,
-      libraryTarget: 'var',
-      libraryExport: 'default',
-      library: 'CropMyScreen',
-      clean: true
-    },
-    devtool: isProduction ? undefined : 'source-map',
-    optimization: {
-      minimizer: [
-        new UglifyJsPlugin({
-          extractComments: true,
-        }),
-      ],
-    },
+module.exports = () => {
+  const rest = {
+    devtool: 'source-map',
     module: {
       rules: [
         {
@@ -52,16 +32,48 @@ module.exports = (env, argv) => {
         ],
         files: 'src'
       })
-    ],
-    devServer: {
-      port: 8765,
-      host: '127.0.0.1',
-      static: {
-        directory: __dirname,
-      },
-      devMiddleware: {
-        publicPath: '/dist'
-      }
-    }
+    ]
   };
+
+  return [
+    {
+      entry: {
+        'crop-my-screen': './src/index.js',
+      },
+      optimization: {
+        minimize: false
+      },
+      output: {
+        library: {
+          type: 'umd'
+        },
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].js',
+        libraryTarget: 'umd',
+        clean: true
+      },
+      ...rest
+    },
+    {
+      entry: {
+        'crop-my-screen.min': './src/index.js'
+      },
+      output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].js',
+        library: {
+          name: 'CropMyScreen',
+          type: 'var',
+          export: 'default'
+        },
+      },
+      optimization: {
+        minimize: true,
+        minimizer: [new TerserPlugin({
+          include: /\.min\.js$/
+        })],
+      },
+      ...rest
+    }
+  ];
 };
